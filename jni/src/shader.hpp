@@ -2,6 +2,7 @@
 #define SHADER_H
 
 #include <SDL.h>
+#define GL_GLEXT_PROTOTYPES 1
 #include <SDL_opengles2.h>
 
 class Shader {
@@ -9,8 +10,10 @@ class Shader {
     void init();
     GLuint program;
     GLint position;
-    GLint color;
-    GLint mvp;
+    GLint uv;
+    GLint projection;
+    GLint view;
+    GLint texture;
   private:
     static const char* vertex_src;
     static const char* fragment_src;

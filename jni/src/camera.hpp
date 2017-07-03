@@ -2,20 +2,22 @@
 #define CAMERA_H
 
 #include <SDL.h>
+#define GL_GLEXT_PROTOTYPES 1
 #include <SDL_opengles2.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include <glm.hpp>
+#include <gtc/matrix_transform.hpp>
+#include <gtc/type_ptr.hpp>
 
 class Camera {
   public:
     Camera();
+    void processInput(float dx, float dy);
     void resize(int w, int h);
     void updateVectors();
-    void updateTransform();
+    void updateView();
     glm::vec3 position;
     glm::mat4 projection;
-    glm::mat4 transform;
+    glm::mat4 view;
     float tilt;
     float pitch;
   private:

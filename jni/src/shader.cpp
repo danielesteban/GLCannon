@@ -1,20 +1,30 @@
 #include "shader.hpp"
 
 const char* Shader::vertex_src =
-" attribute vec4 av4position; "
-" attribute vec3 av3color; "
-" uniform mat4 mvp; "
-" varying vec3 vv3color; "
+" attribute vec4 position; "
+" attribute vec2 uv; "
+" varying vec4 fragmentPosition; "
+" varying vec2 fragmentUV; "
+" uniform mat4 projection; "
+" uniform mat4 view; "
 " void main() { "
-"    vv3color = av3color; "
-"    gl_Position = mvp * av4position; "
+"    fragmentUV = uv; "
+"    fragmentPosition = view * position; "
+"    gl_Position = projection * view * position; "
 " } ";
 
 const char* Shader::fragment_src =
-" precision lowp float; "
-" varying vec3 vv3color; "
+" precision mediump float; "
+" varying vec4 fragmentPosition; "
+" varying vec2 fragmentUV; "
+" uniform sampler2D texture; "
+" const float LOG2 = 1.442695; "
+" const float density = 0.03; "
+" const vec4 fog = vec4(0.0, 0.0, 0.0, 1.0); "
 " void main() { "
-"    gl_FragColor = vec4(vv3color, 1.0); "
+"   float distance = length(fragmentPosition); "
+"	  float fogFactor = clamp(exp2(-density * density * distance * distance * LOG2), 0.0, 1.0); "
+"   gl_FragColor = mix(fog, texture2D(texture, fragmentUV), fogFactor); "
 " } ";
 
 void Shader::process(GLuint *shader, const char *source, GLint shader_type) {
@@ -48,11 +58,9 @@ void Shader::init() {
   glAttachShader(program, fragment);
   glLinkProgram(program);
 
-  position = glGetAttribLocation(program, "av4position");
-  color = glGetAttribLocation(program, "av3color");
-  mvp = glGetUniformLocation(program, "mvp");
-
-  glUseProgram(program);
-  glEnableVertexAttribArray(position);
-  glEnableVertexAttribArray(color);
+  position = glGetAttribLocation(program, "position");
+  uv = glGetAttribLocation(program, "uv");
+  projection = glGetUniformLocation(program, "projection");
+  view = glGetUniformLocation(program, "view");
+  texture = glGetUniformLocation(program, "texture");
 }

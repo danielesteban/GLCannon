@@ -2,17 +2,29 @@
 #define MESH_H
 
 #include <SDL.h>
+#include <SDL_image.h>
+#define GL_GLEXT_PROTOTYPES 1
 #include <SDL_opengles2.h>
+#include <vector>
 #include "camera.hpp"
 #include "shader.hpp"
 
 class Mesh {
   public:
+    Mesh(const GLfloat vbo[], const GLushort ebo[], const GLsizei size, const GLsizei count, const char texture[]);
+    void init(Shader *shader, const glm::vec3 *positions, const int positionsSize);
     void render(Camera *camera, Shader *shader);
   private:
-    static const float vertices[];
-    static const float colors[];
-    glm::mat4 transform;
+    const GLfloat *modelVBO;
+    const GLushort *modelEBO;
+    const GLsizei modelSize;
+    const GLsizei modelCount;
+    const char *modelTexture;
+    GLuint vao;
+    GLuint vbo;
+    GLuint ebo;
+    GLuint texture;
+    std::vector<glm::mat4> transforms;
 };
 
 #endif
