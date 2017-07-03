@@ -5,9 +5,9 @@
 #include <imgui_impl_sdl_gles.h>
 
 #include "camera.hpp"
-#include "mesh.hpp"
-#include "models/cube.hpp"
 #include "shaders/standard.hpp"
+#include "models/cube.hpp"
+#include "meshes/rotatingcube.hpp"
 
 #define FSAA 4
 #define CUBE_COUNT 512
@@ -16,8 +16,8 @@ SDL_Window *gWindow = NULL;
 SDL_GLContext gContext;
 
 Camera camera;
-Cube cubeModel;
-Mesh cubeMeshes[CUBE_COUNT];
+Cube model;
+RotatingCube cubes[CUBE_COUNT];
 StandardShader shader;
 
 void resize();
@@ -56,26 +56,17 @@ void processTouch(int finger, float dx, float dy) {
 
 void setupScene() {
   srand(time(NULL));
-  cubeModel.init(&shader);
+  model.init(&shader);
   for (int i = 0; i < CUBE_COUNT; i += 1) {
-    cubeMeshes[i].init(&cubeModel, glm::vec3(
-      ((float) rand() / (float) RAND_MAX) - 0.5f,
-      ((float) rand() / (float) RAND_MAX) - 0.5f,
-      ((float) rand() / (float) RAND_MAX) - 0.5f
-    ) * glm::vec3(
-      (float) (rand() % 120) + 8.0f,
-      (float) (rand() % 120) + 8.0f,
-      (float) (rand() % 120) + 8.0f
-    ));
+    cubes[i].init(&model, 120);
   }
 }
 
 void renderScene() {
   glUseProgram(shader.program);
-  const glm::quat rotation = glm::quat(glm::vec3(0.0f, sin((float) SDL_GetTicks() / 512.0f), 0.0f));
   for (int i = 0; i < CUBE_COUNT; i += 1) {
-    cubeMeshes[i].setRotation(rotation);
-    cubeMeshes[i].render(&camera);
+    cubes[i].animate();
+    cubes[i].render(&camera);
   }
 }
 

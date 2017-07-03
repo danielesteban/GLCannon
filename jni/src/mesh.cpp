@@ -6,7 +6,7 @@ void Mesh::init(Model *model, const glm::vec3 position) {
   updateTransform();
 }
 
-void Mesh::render(Camera *camera) {
+void Mesh::render(const Camera *camera) {
   model->render(glm::value_ptr(camera->view * transform));
 }
 
@@ -23,3 +23,5 @@ void Mesh::setRotation(const glm::quat rotation) {
 void Mesh::updateTransform() {
   transform = glm::translate(glm::mat4(), position) * glm::toMat4(rotation);
 }
+
+void Mesh::animate() {}
