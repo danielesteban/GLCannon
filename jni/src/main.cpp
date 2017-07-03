@@ -5,17 +5,17 @@
 #include <imgui_impl_sdl_gles.h>
 
 #include "camera.hpp"
-#include "cube.hpp"
-#include "shader.hpp"
+#include "models/cube.hpp"
+#include "shaders/standard.hpp"
 
 #define FSAA 4
 
-SDL_Window* gWindow = NULL;
+SDL_Window *gWindow = NULL;
 SDL_GLContext gContext;
 
 Camera camera;
 Cube cube;
-Shader shader;
+StandardShader shader;
 
 void resize();
 void init() {
@@ -46,11 +46,9 @@ void resize() {
   glUniformMatrix4fv(shader.projection, 1, GL_FALSE, glm::value_ptr(camera.projection));
 }
 
-void processTouch(int finger, float x, float y, float dx, float dy) {
+void processTouch(int finger, float dx, float dy) {
   if (finger > 0) return;
-  // glClearColor(x, 0.0f, y, 1.0f);
   camera.processInput(dx, dy);
-  // SDL_Log("%d %d", (int) (x * 100.0f), (int) (y * 100.0f));
 }
 
 void setupScene() {
@@ -81,9 +79,10 @@ void renderUI() {
   ImGui_ImplSdlGLES_NewFrame(gWindow);
   bool open = true;
   ImGui::Begin("UI", &open, ImVec2(0, 0), 0.3f, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoSavedSettings);
-  ImGui::Text("%.3f ms/frame", 1000.0f / ImGui::GetIO().Framerate);
   ImGui::Text("%.1f FPS", ImGui::GetIO().Framerate);
+  ImGui::Text("%.3f ms/frame", 1000.0f / ImGui::GetIO().Framerate);
   ImGui::Text("%dx%d FSAA x%d", (int)ImGui::GetIO().DisplaySize.x, (int)ImGui::GetIO().DisplaySize.y, FSAA);
+  ImGui::SetWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x - ImGui::GetWindowWidth() - 9, 8));
   ImGui::End();
   ImGui::Render();
 }
@@ -103,7 +102,7 @@ void loop() {
           break;
         case SDL_FINGERDOWN:
         case SDL_FINGERMOTION:
-          processTouch(e.tfinger.fingerId, e.tfinger.x, e.tfinger.y, e.tfinger.dx, e.tfinger.dy);
+          processTouch(e.tfinger.fingerId, e.tfinger.dx, e.tfinger.dy);
           break;
       }
     }
@@ -114,7 +113,7 @@ void loop() {
   }
 }
 
-int main(int argc, char* args[]) {
+int main(int argc, char *args[]) {
   init();
   setupScene();
   loop();
