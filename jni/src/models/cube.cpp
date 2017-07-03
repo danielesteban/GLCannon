@@ -53,4 +53,4 @@ const GLushort Cube::EBO[] = {
 const GLsizei Cube::EBOSIZE = sizeof(Cube::EBO);
 const GLsizei Cube::EBOCOUNT = sizeof(Cube::EBO) / sizeof(GLushort);
 
-const char Cube::TEXTURE[] = "container.webp";
+const char Cube::TEXTURE[] = "container";

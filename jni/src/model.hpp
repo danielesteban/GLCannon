@@ -9,9 +9,19 @@
 
 class Model {
   public:
-    Model(const GLfloat *VBO, const GLsizei VBOSIZE, const GLushort EBO[], const GLsizei EBOSIZE, const GLsizei EBOCOUNT, const char *TEXTURE);
+    Model(
+      const GLfloat *VBO,
+      const GLsizei VBOSIZE,
+      const GLushort EBO[],
+      const GLsizei EBOSIZE,
+      const GLsizei EBOCOUNT,
+      const char *TEXTURE,
+      const GLenum TEXTURETARGET = GL_TEXTURE_2D
+    );
     void init(Shader *shader);
     void render(const GLfloat *view);
+  protected:
+    virtual void bindAttributes();
   private:
     GLuint vao;
     GLuint vbo;
@@ -23,6 +33,7 @@ class Model {
     const GLsizei eboCount;
     GLuint texture;
     const char *textureFilename;
+    const GLenum textureTarget;
     Shader *shader;
 };
 
