@@ -1,17 +1,17 @@
-#ifndef CUBE_H
-#define CUBE_H
+#ifndef CUBE_MODEL_H
+#define CUBE_MODEL_H
 
-#include "mesh.hpp"
+#include "model.hpp"
 
-class Cube : public Mesh {
+class Cube : public Model {
   public:
-    Cube() : Mesh(VBO, EBO, SIZE, COUNT, TEXTURE) {}
-    void animate();
+    Cube() : Model(VBO, VBOSIZE, EBO, EBOSIZE, EBOCOUNT, TEXTURE) {}
   private:
     static const GLfloat VBO[];
+    static const GLsizei VBOSIZE;
     static const GLushort EBO[];
-    static const GLsizei SIZE;
-    static const GLsizei COUNT;
+    static const GLsizei EBOSIZE;
+    static const GLsizei EBOCOUNT;
     static const char TEXTURE[];
 };
 

@@ -5,28 +5,21 @@
 #include <SDL_image.h>
 #define GL_GLEXT_PROTOTYPES 1
 #include <SDL_opengles2.h>
-#include <vector>
 #include "camera.hpp"
-#include "shader.hpp"
+#include "model.hpp"
 
 class Mesh {
   public:
-    Mesh(const GLfloat vbo[], const GLushort ebo[], const GLsizei size, const GLsizei count, const char texture[]);
-    void init(Shader *shader, const glm::vec3 *positions, const int positionsSize);
-    void render(Camera *camera, Shader *shader);
-  protected:
-    std::vector<glm::mat4> initialTransforms;
-    std::vector<glm::mat4> transforms;
+    void init(Model *model, const glm::vec3 position);
+    void render(Camera *camera);
+    void setPosition(const glm::vec3 position);
+    void setRotation(const glm::quat rotation);
+    void updateTransform();
   private:
-    const GLfloat *modelVBO;
-    const GLushort *modelEBO;
-    const GLsizei modelSize;
-    const GLsizei modelCount;
-    const char *modelTexture;
-    GLuint vao;
-    GLuint vbo;
-    GLuint ebo;
-    GLuint texture;
+    Model *model;
+    glm::vec3 position;
+    glm::quat rotation;
+    glm::mat4 transform;
 };
 
 #endif

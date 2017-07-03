@@ -39,6 +39,8 @@ const GLfloat Cube::VBO[] = {
    0.5f,  0.5f,  0.5f,    0.0f,  0.0f,
 };
 
+const GLsizei Cube::VBOSIZE = sizeof(Cube::VBO);
+
 const GLushort Cube::EBO[] = {
   0, 1, 2,      2, 3, 0,
   4, 5, 6,      6, 7, 4,
@@ -48,18 +50,7 @@ const GLushort Cube::EBO[] = {
   20, 21, 22,   22, 23, 20,
 };
 
-const GLsizei Cube::SIZE = sizeof(Cube::VBO);
-const GLsizei Cube::COUNT = sizeof(Cube::EBO) / sizeof(GLushort);
-const char Cube::TEXTURE[] = "container.webp";
+const GLsizei Cube::EBOSIZE = sizeof(Cube::EBO);
+const GLsizei Cube::EBOCOUNT = sizeof(Cube::EBO) / sizeof(GLushort);
 
-void Cube::animate() {
-  std::vector<glm::mat4>::iterator transform;
-  std::vector<glm::mat4>::const_iterator initialTransform;
-  for (
-    transform = transforms.begin(), initialTransform = initialTransforms.begin();
-    transform != transforms.end();
-    ++transform, ++initialTransform
-  ) {
-    (*transform) = glm::rotate((*initialTransform), sin((float) SDL_GetTicks() / 512.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-  }
-}
+const char Cube::TEXTURE[] = "container.webp";

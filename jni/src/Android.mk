@@ -15,7 +15,7 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SDL_PATH)/include \
 	$(LOCAL_PATH)/${IMGUI_PATH}
 
 LOCAL_SRC_FILES := $(SDL_PATH)/src/main/android/SDL_android_main.c \
-	main.cpp camera.cpp mesh.cpp shader.cpp \
+	main.cpp camera.cpp mesh.cpp model.cpp shader.cpp \
 	models/cube.cpp \
 	shaders/standard.cpp \
 	${IMGUI_PATH}/imgui.cpp ${IMGUI_PATH}/imgui_draw.cpp ${IMGUI_PATH}/imgui_impl_sdl_gles.cpp
