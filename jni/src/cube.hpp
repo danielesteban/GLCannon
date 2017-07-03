@@ -6,6 +6,7 @@
 class Cube : public Mesh {
   public:
     Cube() : Mesh(VBO, EBO, SIZE, COUNT, TEXTURE) {}
+    void animate();
   private:
     static const GLfloat VBO[];
     static const GLushort EBO[];

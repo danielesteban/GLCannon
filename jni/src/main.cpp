@@ -1,10 +1,14 @@
 #include <SDL.h>
 #define GL_GLEXT_PROTOTYPES 1
 #include <SDL_opengles2.h>
+#include <imgui.h>
+#include <imgui_impl_sdl_gles.h>
 
 #include "camera.hpp"
 #include "cube.hpp"
 #include "shader.hpp"
+
+#define FSAA 4
 
 SDL_Window* gWindow = NULL;
 SDL_GLContext gContext;
@@ -20,7 +24,7 @@ void init() {
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
   SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-  SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 6);
+  SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, FSAA);
   SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
   gWindow = SDL_CreateWindow("GLTest", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 0, 0, SDL_WINDOW_OPENGL);
   gContext = SDL_GL_CreateContext(gWindow);
@@ -30,6 +34,7 @@ void init() {
   SDL_GL_SetSwapInterval(1);
   shader.init();
   resize();
+  ImGui_ImplSdlGLES_Init(gWindow);
 }
 
 void resize() {
@@ -67,29 +72,32 @@ void setupScene() {
 }
 
 void renderScene() {
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glUseProgram(shader.program);
+  cube.animate();
   cube.render(&camera, &shader);
-  SDL_GL_SwapWindow(gWindow);
+}
+
+void renderUI() {
+  ImGui_ImplSdlGLES_NewFrame(gWindow);
+  bool open = true;
+  ImGui::Begin("UI", &open, ImVec2(0, 0), 0.3f, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoSavedSettings);
+  ImGui::Text("%.3f ms/frame", 1000.0f / ImGui::GetIO().Framerate);
+  ImGui::Text("%.1f FPS", ImGui::GetIO().Framerate);
+  ImGui::Text("%dx%d FSAA x%d", (int)ImGui::GetIO().DisplaySize.x, (int)ImGui::GetIO().DisplaySize.y, FSAA);
+  ImGui::End();
+  ImGui::Render();
 }
 
 void loop() {
-  SDL_bool quit = SDL_FALSE;
   SDL_Event e;
+  bool quit = false;
   while (!quit) {
     while (SDL_PollEvent(&e) != 0) {
+      ImGui_ImplSdlGLES_ProcessEvent(&e);
       switch (e.type) {
         case SDL_QUIT:
-          quit = SDL_TRUE;
-          break;
-        case SDL_KEYDOWN:
-          {
-            if (!e.key.repeat && e.key.keysym.sym == SDLK_AC_BACK) {
-              SDL_Quit();
-              return;
-            }
-          }
-          break;
+          quit = true;
+          return;
         case SDL_WINDOWEVENT_RESIZED:
           resize();
           break;
@@ -99,7 +107,10 @@ void loop() {
           break;
       }
     }
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     renderScene();
+    renderUI();
+    SDL_GL_SwapWindow(gWindow);
   }
 }
 

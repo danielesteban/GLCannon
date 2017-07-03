@@ -51,3 +51,15 @@ const GLushort Cube::EBO[] = {
 const GLsizei Cube::SIZE = sizeof(Cube::VBO);
 const GLsizei Cube::COUNT = sizeof(Cube::EBO) / sizeof(GLushort);
 const char Cube::TEXTURE[] = "container.webp";
+
+void Cube::animate() {
+  std::vector<glm::mat4>::iterator transform;
+  std::vector<glm::mat4>::const_iterator initialTransform;
+  for (
+    transform = transforms.begin(), initialTransform = initialTransforms.begin();
+    transform != transforms.end();
+    ++transform, ++initialTransform
+  ) {
+    (*transform) = glm::rotate((*initialTransform), sin((float) SDL_GetTicks() / 512.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+  }
+}

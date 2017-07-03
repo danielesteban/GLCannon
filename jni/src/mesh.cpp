@@ -41,11 +41,14 @@ void Mesh::init(Shader *shader, const glm::vec3 *positions, const int positionsS
   glVertexAttribPointer(shader->uv, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*) (3 * sizeof(GLfloat)));
   glBindVertexArrayOES(0);
 
+  transforms.reserve(positionsSize);
   for (int i = 0; i < positionsSize; i += 1) {
     glm::mat4 transform;
     transform = glm::translate(transform, positions[i]);
     transforms.push_back(transform);
   }
+  initialTransforms.reserve(positionsSize);
+  copy(transforms.begin(), transforms.end(), back_inserter(initialTransforms));
 }
 
 void Mesh::render(Camera *camera, Shader *shader) {

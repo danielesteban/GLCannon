@@ -14,6 +14,9 @@ class Mesh {
     Mesh(const GLfloat vbo[], const GLushort ebo[], const GLsizei size, const GLsizei count, const char texture[]);
     void init(Shader *shader, const glm::vec3 *positions, const int positionsSize);
     void render(Camera *camera, Shader *shader);
+  protected:
+    std::vector<glm::mat4> initialTransforms;
+    std::vector<glm::mat4> transforms;
   private:
     const GLfloat *modelVBO;
     const GLushort *modelEBO;
@@ -24,7 +27,6 @@ class Mesh {
     GLuint vbo;
     GLuint ebo;
     GLuint texture;
-    std::vector<glm::mat4> transforms;
 };
 
 #endif
