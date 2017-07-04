@@ -5,20 +5,27 @@
 #include <imgui_impl_sdl_gles.h>
 
 #include "camera.hpp"
+#include "mesh.hpp"
+#include "shaders/skybox.hpp"
 #include "shaders/standard.hpp"
 #include "models/cube.hpp"
+#include "models/skybox.hpp"
 #include "meshes/rotatingcube.hpp"
 
-#define FSAA 4
+#define FSAA 2
 #define CUBE_COUNT 512
 
 SDL_Window *gWindow = NULL;
 SDL_GLContext gContext;
 
 Camera camera;
-Cube model;
+Cube cubeModel;
+Skybox skyboxModel;
 RotatingCube cubes[CUBE_COUNT];
-StandardShader shader;
+Mesh skybox;
+
+StandardShader cubeShader;
+SkyboxShader skyboxShader;
 
 void resize();
 void init() {
@@ -35,7 +42,8 @@ void init() {
   glEnable(GL_DEPTH_TEST);
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   SDL_GL_SetSwapInterval(1);
-  shader.init();
+  cubeShader.init();
+  skyboxShader.init();
   resize();
   ImGui_ImplSdlGLES_Init(gWindow);
 }
@@ -45,8 +53,10 @@ void resize() {
   SDL_GL_GetDrawableSize(gWindow, &w, &h);
   glViewport(0, 0, w, h);
   camera.resize(w, h);
-  glUseProgram(shader.program);
-  glUniformMatrix4fv(shader.projection, 1, GL_FALSE, glm::value_ptr(camera.projection));
+  glUseProgram(cubeShader.program);
+  glUniformMatrix4fv(cubeShader.projection, 1, GL_FALSE, glm::value_ptr(camera.projection));
+  glUseProgram(skyboxShader.program);
+  glUniformMatrix4fv(skyboxShader.projection, 1, GL_FALSE, glm::value_ptr(camera.projection));
 }
 
 void processTouch(int finger, float dx, float dy) {
@@ -56,18 +66,24 @@ void processTouch(int finger, float dx, float dy) {
 
 void setupScene() {
   srand(time(NULL));
-  model.init(&shader);
+  cubeModel.init(&cubeShader);
   for (int i = 0; i < CUBE_COUNT; i += 1) {
-    cubes[i].init(&model, 120);
+    cubes[i].init(&cubeModel, 120);
   }
+  skyboxModel.init(&skyboxShader);
+  skybox.init(&skyboxModel, camera.position);
 }
 
 void renderScene() {
-  glUseProgram(shader.program);
+  glUseProgram(cubeShader.program);
   for (int i = 0; i < CUBE_COUNT; i += 1) {
     cubes[i].animate();
     cubes[i].render(&camera);
   }
+  glUseProgram(skyboxShader.program);
+  glDepthFunc(GL_LEQUAL);
+  skybox.render(&camera);
+  glDepthFunc(GL_LESS);
 }
 
 void renderUI() {

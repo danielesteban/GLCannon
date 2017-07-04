@@ -1,7 +1,7 @@
 #include "standard.hpp"
 
 const char *StandardShader::VERTEX =
-" attribute vec4 position; "
+" attribute vec3 position; "
 " attribute vec2 uv; "
 " varying vec4 fragmentPosition; "
 " varying vec2 fragmentUV; "
@@ -9,12 +9,12 @@ const char *StandardShader::VERTEX =
 " uniform mat4 view; "
 " void main() { "
 "   fragmentUV = uv; "
-"   fragmentPosition = view * position; "
-"   gl_Position = projection * view * position; "
+"   fragmentPosition = view * vec4(position, 1.0); "
+"   gl_Position = projection * fragmentPosition; "
 " } ";
 
 const char *StandardShader::FRAGMENT =
-" precision mediump float; "
+" precision lowp float; "
 " varying vec4 fragmentPosition; "
 " varying vec2 fragmentUV; "
 " uniform sampler2D texture; "

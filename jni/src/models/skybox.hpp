@@ -1,11 +1,11 @@
-#ifndef CUBE_MODEL_H
-#define CUBE_MODEL_H
+#ifndef SKYBOX_MODEL_H
+#define SKYBOX_MODEL_H
 
 #include "model.hpp"
 
-class Cube : public Model {
+class Skybox : public Model {
   public:
-    Cube() : Model(VBO, VBOSIZE, EBO, EBOSIZE, EBOCOUNT, TEXTURE) {}
+    Skybox() : Model(VBO, VBOSIZE, EBO, EBOSIZE, EBOCOUNT, TEXTURE, GL_TEXTURE_CUBE_MAP) {}
     void init(Shader *shader);
   private:
     static const GLfloat VBO[];

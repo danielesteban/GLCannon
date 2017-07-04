@@ -34,6 +34,7 @@ void Model::init(Shader *shader) {
   }
   if (textureTarget == GL_TEXTURE_CUBE_MAP) {
     for (unsigned int i = 0; i < 6; i += 1) {
+      // right left top bottom back front
       char *filename = new char[strlen(textureFilename) + 7];
       sprintf(filename, "%s%d.webp", textureFilename, i);
       SDL_Surface *surface = IMG_Load(filename);
@@ -56,15 +57,6 @@ void Model::init(Shader *shader) {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, eboSize, eboData, GL_STATIC_DRAW);
   glUseProgram(shader->program);
-  bindAttributes();
-  glBindVertexArrayOES(0);
-}
-
-void Model::bindAttributes() {
-  glEnableVertexAttribArray(shader->position);
-  glVertexAttribPointer(shader->position, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0);
-  glEnableVertexAttribArray(shader->uv);
-  glVertexAttribPointer(shader->uv, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*) (3 * sizeof(GLfloat)));
 }
 
 void Model::render(const GLfloat *view) {

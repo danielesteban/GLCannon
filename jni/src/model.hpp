@@ -18,10 +18,10 @@ class Model {
       const char *TEXTURE,
       const GLenum TEXTURETARGET = GL_TEXTURE_2D
     );
-    void init(Shader *shader);
+    virtual void init(Shader *shader);
     void render(const GLfloat *view);
   protected:
-    virtual void bindAttributes();
+    Shader *shader;
   private:
     GLuint vao;
     GLuint vbo;
@@ -34,7 +34,6 @@ class Model {
     GLuint texture;
     const char *textureFilename;
     const GLenum textureTarget;
-    Shader *shader;
 };
 
 #endif

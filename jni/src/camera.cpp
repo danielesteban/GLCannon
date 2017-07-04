@@ -28,7 +28,7 @@ void Camera::processInput(float dx, float dy) {
 
 void Camera::resize(int w, int h) {
   const float aspect = (float) w / (float) h;
-  projection = glm::perspective(glm::radians(75.0f), aspect, 0.1f, 512.0f);
+  projection = glm::perspective(glm::radians(60.0f), aspect, 0.1f, 512.0f);
   updateView();
 }
 
