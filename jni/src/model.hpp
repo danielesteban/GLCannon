@@ -5,6 +5,7 @@
 #include <SDL_image.h>
 #define GL_GLEXT_PROTOTYPES 1
 #include <SDL_opengles2.h>
+#include <btBulletDynamicsCommon.h>
 #include "shader.hpp"
 
 class Model {
@@ -20,6 +21,7 @@ class Model {
     );
     virtual void init(Shader *shader);
     void render(const GLfloat *view);
+    btCollisionShape *collision;
   protected:
     Shader *shader;
   private:

@@ -5,6 +5,7 @@
 #include <SDL_image.h>
 #define GL_GLEXT_PROTOTYPES 1
 #include <SDL_opengles2.h>
+#include <btBulletDynamicsCommon.h>
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
@@ -15,17 +16,18 @@
 
 class Mesh {
   public:
-    virtual void init(Model *model, const glm::vec3 position);
+    virtual void init(btDiscreteDynamicsWorld *world, Model *model, const btVector3 position, const btScalar mass = btScalar(0.0f));
     virtual void render(const Camera *camera);
-    void setPosition(const glm::vec3 position);
-    void setRotation(const glm::quat rotation);
-    virtual void animate();
+    virtual void animate(const btScalar delta);
+    void setPosition(const btVector3 position);
+    void setRotation(const btQuaternion rotation);
+  protected:
+    void updateView();
   private:
-    void updateTransform();
     Model *model;
-    glm::vec3 position;
-    glm::quat rotation;
-    glm::mat4 transform;
+    btRigidBody *body;
+    btTransform transform;
+    glm::mat4 view;
 };
 
 #endif

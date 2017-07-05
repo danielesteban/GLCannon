@@ -1,31 +1,36 @@
-#include <SDL.h>
-#define GL_GLEXT_PROTOTYPES 1
-#include <SDL_opengles2.h>
-#include <imgui.h>
-#include <imgui_impl_sdl_gles.h>
-
 #include "camera.hpp"
 #include "mesh.hpp"
 #include "shaders/skybox.hpp"
 #include "shaders/standard.hpp"
 #include "models/cube.hpp"
+#include "models/ground.hpp"
 #include "models/skybox.hpp"
-#include "meshes/rotatingcube.hpp"
+#include <imgui.h>
+#include <imgui_impl_sdl_gles.h>
 
-#define FSAA 2
+#define FSAA 1
 #define CUBE_COUNT 512
-
-SDL_Window *gWindow = NULL;
-SDL_GLContext gContext;
+#define CUBE_RADIUS 128
 
 Camera camera;
 Cube cubeModel;
+Ground groundModel;
 Skybox skyboxModel;
-RotatingCube cubes[CUBE_COUNT];
+Mesh cubes[CUBE_COUNT];
+Mesh ground;
 Mesh skybox;
 
-StandardShader cubeShader;
+StandardShader standardShader;
 SkyboxShader skyboxShader;
+
+btDefaultCollisionConfiguration *collisionConfiguration;
+btCollisionDispatcher *dispatcher;
+btBroadphaseInterface *overlappingPairCache;
+btSequentialImpulseConstraintSolver *solver;
+btDiscreteDynamicsWorld *world;
+
+SDL_Window *gWindow = NULL;
+SDL_GLContext gContext;
 
 void resize();
 void init() {
@@ -40,12 +45,19 @@ void init() {
   gContext = SDL_GL_CreateContext(gWindow);
   glEnable(GL_CULL_FACE);
   glEnable(GL_DEPTH_TEST);
-  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+  glClearColor(0.04f, 0.08f, 0.14f, 1.0f);
   SDL_GL_SetSwapInterval(1);
-  cubeShader.init();
+  standardShader.init();
   skyboxShader.init();
   resize();
   ImGui_ImplSdlGLES_Init(gWindow);
+
+  collisionConfiguration = new btDefaultCollisionConfiguration();
+  dispatcher = new btCollisionDispatcher(collisionConfiguration);
+  overlappingPairCache = new btDbvtBroadphase();
+  solver = new btSequentialImpulseConstraintSolver;
+  world = new btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
+  world->setGravity(btVector3(0.0f, -9.8f, 0.0f));
 }
 
 void resize() {
@@ -53,8 +65,8 @@ void resize() {
   SDL_GL_GetDrawableSize(gWindow, &w, &h);
   glViewport(0, 0, w, h);
   camera.resize(w, h);
-  glUseProgram(cubeShader.program);
-  glUniformMatrix4fv(cubeShader.projection, 1, GL_FALSE, glm::value_ptr(camera.projection));
+  glUseProgram(standardShader.program);
+  glUniformMatrix4fv(standardShader.projection, 1, GL_FALSE, glm::value_ptr(camera.projection));
   glUseProgram(skyboxShader.program);
   glUniformMatrix4fv(skyboxShader.projection, 1, GL_FALSE, glm::value_ptr(camera.projection));
 }
@@ -66,20 +78,42 @@ void processTouch(int finger, float dx, float dy) {
 
 void setupScene() {
   srand(time(NULL));
-  cubeModel.init(&cubeShader);
+  cubeModel.init(&standardShader);
   for (int i = 0; i < CUBE_COUNT; i += 1) {
-    cubes[i].init(&cubeModel, 120);
+    cubes[i].init(world, &cubeModel, btVector3(
+      ((float) rand() / (float) RAND_MAX) - 0.5f,
+      ((float) rand() / (float) RAND_MAX) - 0.5f,
+      ((float) rand() / (float) RAND_MAX) - 0.5f
+    ) * btVector3(
+      (float) (rand() % CUBE_RADIUS),
+      (float) (rand() % (CUBE_RADIUS * 2)) + (float) CUBE_RADIUS,
+      (float) (rand() % CUBE_RADIUS)
+    ), btScalar(0.5f));
+    cubes[i].setRotation(btQuaternion(btVector3(
+      ((float) rand() / (float) RAND_MAX) - 0.5f,
+      ((float) rand() / (float) RAND_MAX) - 0.5f,
+      ((float) rand() / (float) RAND_MAX) - 0.5f
+    ), btScalar(glm::radians((float) (rand() % 360)))));
   }
+  groundModel.init(&standardShader);
+  ground.init(world, &groundModel, btVector3(0.0f, -1.0f, 0.0f));
   skyboxModel.init(&skyboxShader);
-  skybox.init(&skyboxModel, camera.position);
+  skybox.init(world, &skyboxModel, btVector3(camera.position[0], camera.position[1], camera.position[2]));
+}
+
+void animateScene(const btScalar delta) {
+  world->stepSimulation(delta, 4);
+  for (int i = 0; i < CUBE_COUNT; i += 1) {
+    cubes[i].animate(delta);
+  }
 }
 
 void renderScene() {
-  glUseProgram(cubeShader.program);
+  glUseProgram(standardShader.program);
   for (int i = 0; i < CUBE_COUNT; i += 1) {
-    cubes[i].animate();
     cubes[i].render(&camera);
   }
+  ground.render(&camera);
   glUseProgram(skyboxShader.program);
   glDepthFunc(GL_LEQUAL);
   skybox.render(&camera);
@@ -101,6 +135,7 @@ void renderUI() {
 void loop() {
   SDL_Event e;
   bool quit = false;
+  unsigned int lastTicks = SDL_GetTicks();
   while (!quit) {
     while (SDL_PollEvent(&e) != 0) {
       ImGui_ImplSdlGLES_ProcessEvent(&e);
@@ -117,6 +152,10 @@ void loop() {
           break;
       }
     }
+    unsigned int currentTicks = SDL_GetTicks();
+    const btScalar delta = btScalar(currentTicks - lastTicks) / btScalar(1000.0f);
+    lastTicks = currentTicks;
+    animateScene(delta);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     renderScene();
     renderUI();

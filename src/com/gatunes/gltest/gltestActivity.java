@@ -5,6 +5,7 @@ public class gltestActivity extends SDLActivity {
       return new String[] {
           "SDL2",
           "SDL2_image",
+          "Bullet",
           "main"
       };
   }

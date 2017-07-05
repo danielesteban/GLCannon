@@ -8,10 +8,19 @@ Model::Model(
   const GLsizei EBOCOUNT,
   const char *TEXTURE,
   const GLenum TEXTURETARGET
-) : vboData(VBO), vboSize(VBOSIZE), eboData(EBO), eboSize(EBOSIZE), eboCount(EBOCOUNT), textureFilename(TEXTURE), textureTarget(TEXTURETARGET) {}
+) : vboData(VBO),
+    vboSize(VBOSIZE),
+    eboData(EBO),
+    eboSize(EBOSIZE),
+    eboCount(EBOCOUNT),
+    textureFilename(TEXTURE),
+    textureTarget(TEXTURETARGET) {
+
+    }
 
 void Model::init(Shader *shader) {
   this->shader = shader;
+  collision = NULL;
 
   glGenTextures(1, &texture);
   glBindTexture(textureTarget, texture);
@@ -25,16 +34,15 @@ void Model::init(Shader *shader) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, surface->w, surface->h, 0, GL_RGB, GL_UNSIGNED_BYTE, surface->pixels);
     glGenerateMipmap(GL_TEXTURE_2D);
-    GLfloat anisotropy;
-    glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &anisotropy);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, anisotropy);
+    // GLfloat anisotropy;
+    // glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &anisotropy);
+    // glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, anisotropy);
     glBindTexture(GL_TEXTURE_2D, 0);
     SDL_FreeSurface(surface);
     delete [] filename;
   }
   if (textureTarget == GL_TEXTURE_CUBE_MAP) {
     for (unsigned int i = 0; i < 6; i += 1) {
-      // right left top bottom back front
       char *filename = new char[strlen(textureFilename) + 7];
       sprintf(filename, "%s%d.webp", textureFilename, i);
       SDL_Surface *surface = IMG_Load(filename);
@@ -56,7 +64,6 @@ void Model::init(Shader *shader) {
   glGenBuffers(1, &ebo);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, eboSize, eboData, GL_STATIC_DRAW);
-  glUseProgram(shader->program);
 }
 
 void Model::render(const GLfloat *view) {

@@ -57,9 +57,11 @@ const char Cube::TEXTURE[] = "container";
 
 void Cube::init(Shader *shader) {
   Model::init(shader);
+  glUseProgram(shader->program);
   glEnableVertexAttribArray(shader->position);
   glVertexAttribPointer(shader->position, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0);
   glEnableVertexAttribArray(shader->uv);
   glVertexAttribPointer(shader->uv, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*) (3 * sizeof(GLfloat)));
   glBindVertexArrayOES(0);
+  collision = new btBoxShape(btVector3(0.5f, 0.5f, 0.5f));
 }

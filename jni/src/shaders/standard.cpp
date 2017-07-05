@@ -20,7 +20,7 @@ const char *StandardShader::FRAGMENT =
 " uniform sampler2D texture; "
 " const float LOG2 = 1.442695; "
 " const float density = 0.03; "
-" const vec4 fog = vec4(0.0, 0.0, 0.0, 1.0); "
+" const vec4 fog = vec4(0.04, 0.08, 0.14, 1.0); "
 " void main() { "
 "   float distance = length(fragmentPosition); "
 "   float fogFactor = clamp(exp2(-density * density * distance * distance * LOG2), 0.0, 1.0); "
