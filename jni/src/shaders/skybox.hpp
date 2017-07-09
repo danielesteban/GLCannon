@@ -1,5 +1,4 @@
-#ifndef SKYBOX_SHADER_H
-#define SKYBOX_SHADER_H
+#pragma once
 
 #include "shader.hpp"
 
@@ -10,5 +9,3 @@ class SkyboxShader : public Shader {
     static const char *VERTEX;
     static const char *FRAGMENT;
 };
-
-#endif
