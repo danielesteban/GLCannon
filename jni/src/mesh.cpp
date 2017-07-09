@@ -36,12 +36,17 @@ void Mesh::setRotation(const btQuaternion rotation) {
   updateView();
 }
 
+void Mesh::applyImpulse(const btVector3 impulse) {
+  body->activate(true);
+  body->applyCentralImpulse(impulse);
+}
+
 void Mesh::updateView() {
   transform.getOpenGLMatrix(glm::value_ptr(view));
 }
 
 void Mesh::animate(const btScalar delta) {
-  if (body != NULL) {
+  if (body != NULL && body->isActive()) {
     body->getMotionState()->getWorldTransform(transform);
     updateView();
   }

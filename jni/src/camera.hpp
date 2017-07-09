@@ -18,13 +18,13 @@ class Camera {
     glm::vec3 position;
     glm::mat4 projection;
     glm::mat4 view;
-    float tilt;
-    float pitch;
-  private:
-    static const glm::vec3 worldUp;
     glm::vec3 front;
     glm::vec3 right;
     glm::vec3 up;
+  private:
+    float tilt;
+    float pitch;
+    static const glm::vec3 worldUp;
 };
 
 #endif

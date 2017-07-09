@@ -21,6 +21,7 @@ class Mesh {
     virtual void animate(const btScalar delta);
     void setPosition(const btVector3 position);
     void setRotation(const btQuaternion rotation);
+    void applyImpulse(const btVector3 impulse);
   protected:
     void updateView();
   private:
