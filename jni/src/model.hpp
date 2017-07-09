@@ -1,5 +1,4 @@
-#ifndef MODEL_H
-#define MODEL_H
+#pragma once
 
 #include <SDL.h>
 #include <SDL_image.h>
@@ -37,5 +36,3 @@ class Model {
     const char *textureFilename;
     const GLenum textureTarget;
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef CUBE_MODEL_H
-#define CUBE_MODEL_H
+#pragma once
 
 #include "model.hpp"
 
@@ -15,5 +14,3 @@ class Cube : public Model {
     static const GLsizei EBOCOUNT;
     static const char TEXTURE[];
 };
-
-#endif

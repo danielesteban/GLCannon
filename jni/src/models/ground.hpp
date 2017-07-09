@@ -1,5 +1,4 @@
-#ifndef GROUND_MODEL_H
-#define GROUND_MODEL_H
+#pragma once
 
 #include "model.hpp"
 
@@ -15,5 +14,3 @@ class Ground : public Model {
     static const GLsizei EBOCOUNT;
     static const char TEXTURE[];
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef SHADER_H
-#define SHADER_H
+#pragma once
 
 #include <SDL.h>
 #define GL_GLEXT_PROTOTYPES 1
@@ -22,5 +21,3 @@ class Shader {
     GLuint vertex;
     void process(GLuint *shader, const char *source, GLint shader_type);
 };
-
-#endif

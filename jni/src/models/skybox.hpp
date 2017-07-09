@@ -1,5 +1,4 @@
-#ifndef SKYBOX_MODEL_H
-#define SKYBOX_MODEL_H
+#pragma once
 
 #include "model.hpp"
 
@@ -15,5 +14,3 @@ class Skybox : public Model {
     static const GLsizei EBOCOUNT;
     static const char TEXTURE[];
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef MESH_H
-#define MESH_H
+#pragma once
 
 #include <SDL.h>
 #include <SDL_image.h>
@@ -30,5 +29,3 @@ class Mesh {
     btTransform transform;
     glm::mat4 view;
 };
-
-#endif

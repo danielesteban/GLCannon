@@ -1,5 +1,4 @@
-#ifndef CAMERA_H
-#define CAMERA_H
+#pragma once
 
 #include <SDL.h>
 #define GL_GLEXT_PROTOTYPES 1
@@ -26,5 +25,3 @@ class Camera {
     float pitch;
     static const glm::vec3 worldUp;
 };
-
-#endif

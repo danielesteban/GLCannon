@@ -1,13 +1,13 @@
-#include "camera.hpp"
-#include "mesh.hpp"
 #include "shaders/skybox.hpp"
 #include "shaders/standard.hpp"
 #include "models/cube.hpp"
 #include "models/ground.hpp"
 #include "models/skybox.hpp"
+#include "camera.hpp"
+#include "mesh.hpp"
+#include "fontawesome.hpp"
 #include <imgui.h>
 #include <imgui_impl_sdl_gles.h>
-#include <IconsFontAwesome.h>
 #include <vector>
 
 #define FSAA 2
