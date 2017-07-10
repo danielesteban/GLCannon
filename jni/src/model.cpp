@@ -7,14 +7,18 @@ Model::Model(
   const GLsizei EBOSIZE,
   const GLsizei EBOCOUNT,
   const char *TEXTURE,
-  const GLenum TEXTURETARGET
+  const GLenum TEXTURETARGET,
+  const GLint TEXTUREFORMAT,
+  const GLint TEXTUREWRAP
 ) : vboData(VBO),
     vboSize(VBOSIZE),
     eboData(EBO),
     eboSize(EBOSIZE),
     eboCount(EBOCOUNT),
     textureFilename(TEXTURE),
-    textureTarget(TEXTURETARGET) {
+    textureTarget(TEXTURETARGET),
+    textureFormat(TEXTUREFORMAT),
+    textureWrap(TEXTUREWRAP) {
 
     }
 
@@ -33,38 +37,32 @@ void Model::init(Shader *shader) {
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, eboSize, eboData, GL_STATIC_DRAW);
 }
 
-void Model::initTexture(SDL_Surface *surface) {
-  char *filename = NULL;
-  bool loadFromFile = surface == NULL;
+void Model::initTexture() {
   glGenTextures(1, &texture);
   glBindTexture(textureTarget, texture);
   if (textureTarget == GL_TEXTURE_2D) {
-    if (loadFromFile) {
-      filename = new char[strlen(textureFilename) + 6];
-      sprintf(filename, "%s.webp", textureFilename);
-      surface = IMG_Load(filename);
-    }
+    char *filename = new char[strlen(textureFilename) + 6];
+    sprintf(filename, "%s.webp", textureFilename);
+    SDL_Surface *surface = IMG_Load(filename);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, surface->w, surface->h, 0, GL_RGB, GL_UNSIGNED_BYTE, surface->pixels);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, textureWrap);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, textureWrap);
+    glTexImage2D(GL_TEXTURE_2D, 0, textureFormat, surface->w, surface->h, 0, textureFormat, GL_UNSIGNED_BYTE, surface->pixels);
     glGenerateMipmap(GL_TEXTURE_2D);
     // GLfloat anisotropy;
     // glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &anisotropy);
     // glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, anisotropy);
-    if (loadFromFile) {
-      SDL_FreeSurface(surface);
-      delete [] filename;
-      filename = NULL;
-    }
+    SDL_FreeSurface(surface);
+    delete [] filename;
+    filename = NULL;
   }
   if (textureTarget == GL_TEXTURE_CUBE_MAP) {
     for (unsigned int i = 0; i < 6; i += 1) {
-      filename = new char[strlen(textureFilename) + 7];
+      char *filename = new char[strlen(textureFilename) + 7];
       sprintf(filename, "%s%d.webp", textureFilename, i);
-      surface = IMG_Load(filename);
-      glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, surface->w, surface->h, 0, GL_RGB, GL_UNSIGNED_BYTE, surface->pixels);
+      SDL_Surface *surface = IMG_Load(filename);
+      glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, textureFormat, surface->w, surface->h, 0, textureFormat, GL_UNSIGNED_BYTE, surface->pixels);
       SDL_FreeSurface(surface);
       delete [] filename;
       filename = NULL;

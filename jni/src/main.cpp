@@ -16,7 +16,7 @@
 #define FSAA 2
 
 Camera camera;
-ButtonModel buttonModel;
+ButtonModel fireButtonModel;
 CubeModel cubeModel;
 GroundModel groundModel;
 SkyboxModel skyboxModel;
@@ -139,21 +139,21 @@ void processTouch(const Uint32 event, const int finger, const float x, const flo
 
 void setupScene() {
   srand(time(NULL));
-  buttonModel.init(&buttonShader);
   cubeModel.init(&standardShader);
   groundModel.init(&standardShader);
+  fireButtonModel.init(&buttonShader, "fire");
   ground.init(world, &groundModel, btVector3(0.0f, -1.0f, 0.0f));
   skyboxModel.init(&skyboxShader);
   skybox.init(NULL, &skyboxModel, btVector3(camera.position[0], camera.position[1], camera.position[2]));
-  fireButton.init(&buttonModel, btVector3(camera.canvas2D[0] - 128.0f, 64.0f, 0.0f));
+  fireButton.init(&fireButtonModel, btVector3(camera.canvas2D[0] - 96.0f, 96.0f, 0.0f));
 }
 
-void animateScene(const btScalar delta) {
+void simulateScene(const btScalar delta) {
   world->stepSimulation(delta, 4);
   for (std::vector<Mesh>::iterator cube = cubes.begin(); cube != cubes.end(); ++cube) {
-    (*cube).animate(delta);
+    (*cube).simulate(delta);
   }
-  fireButton.animate(delta);
+  fireButton.simulate(delta);
 }
 
 void renderScene() {
@@ -208,7 +208,7 @@ void loop() {
     unsigned int currentTicks = SDL_GetTicks();
     const btScalar delta = btScalar(currentTicks - lastTicks) / btScalar(1000.0f);
     lastTicks = currentTicks;
-    animateScene(delta);
+    simulateScene(delta);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     renderScene();
     renderUI();

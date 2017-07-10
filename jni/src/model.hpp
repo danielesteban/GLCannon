@@ -16,13 +16,16 @@ class Model {
       const GLsizei EBOSIZE,
       const GLsizei EBOCOUNT,
       const char *TEXTURE = NULL,
-      const GLenum TEXTURETARGET = GL_TEXTURE_2D
+      const GLenum TEXTURETARGET = GL_TEXTURE_2D,
+      const GLint TEXTUREFORMAT = GL_RGB,
+      const GLint TEXTUREWRAP = GL_REPEAT
     );
     virtual void init(Shader *shader);
-    void initTexture(SDL_Surface *surface = NULL);
+    void initTexture();
     void render(const GLfloat *view);
     btCollisionShape *collision;
     Shader *shader;
+    const char *textureFilename;
   private:
     GLuint vao;
     GLuint vbo;
@@ -33,6 +36,7 @@ class Model {
     const GLsizei eboSize;
     const GLsizei eboCount;
     GLuint texture;
-    const char *textureFilename;
     const GLenum textureTarget;
+    const GLint textureFormat;
+    const GLint textureWrap;
 };

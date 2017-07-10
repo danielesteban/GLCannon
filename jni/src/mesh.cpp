@@ -45,7 +45,7 @@ void Mesh::updateView() {
   transform.getOpenGLMatrix(glm::value_ptr(view));
 }
 
-void Mesh::animate(const btScalar delta) {
+void Mesh::simulate(const btScalar delta) {
   if (body != NULL && body->isActive()) {
     body->getMotionState()->getWorldTransform(transform);
     updateView();

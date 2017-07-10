@@ -17,7 +17,7 @@ class Mesh {
   public:
     virtual void init(btDiscreteDynamicsWorld *world, Model *model, const btVector3 position, const btScalar mass = btScalar(0.0f));
     virtual void render(const Camera *camera);
-    virtual void animate(const btScalar delta);
+    virtual void simulate(const btScalar delta);
     void setPosition(const btVector3 position);
     void setRotation(const btQuaternion rotation);
     void applyImpulse(const btVector3 impulse);

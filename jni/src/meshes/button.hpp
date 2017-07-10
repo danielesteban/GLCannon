@@ -6,7 +6,7 @@ class Button : public Mesh {
   public:
     void init(Model *model, const btVector3 position);
     void render(const Camera *camera = NULL);
-    void animate(const btScalar delta);
+    void simulate(const btScalar delta);
     bool isHover(const float x, const float y);
     bool isFiring();
     void setFiring(const bool state);

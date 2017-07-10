@@ -19,13 +19,13 @@ void Button::render(const Camera *camera) {
   Mesh::render(NULL);
 }
 
-void Button::animate(const btScalar delta) {
+void Button::simulate(const btScalar delta) {
   const btScalar step = 2.0f * delta;
   if (!firing) return;
   if (raising) {
     force += step;
-    if (force > 1.0f) {
-      force = 1.0f;
+    if (force > 1.25f) {
+      force = 1.25f;
       raising = false;
     }
   } else {
@@ -35,7 +35,7 @@ void Button::animate(const btScalar delta) {
       raising = true;
     }
   }
-  albedo[0] = fmax(0.1f, force);
+  albedo[0] = fmin(fmax(force, 0.1f), 1.0f);
 }
 
 bool Button::isFiring() {
@@ -50,5 +50,5 @@ void Button::setFiring(const bool state) {
 }
 
 btScalar Button::getForce() {
-  return force;
+  return fmin(force, 1.0f);
 }
