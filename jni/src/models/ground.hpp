@@ -2,9 +2,9 @@
 
 #include "model.hpp"
 
-class Ground : public Model {
+class GroundModel : public Model {
   public:
-    Ground() : Model(VBO, VBOSIZE, EBO, EBOSIZE, EBOCOUNT, TEXTURE) {}
+    GroundModel() : Model(VBO, VBOSIZE, EBO, EBOSIZE, EBOCOUNT, TEXTURE) {}
     void init(Shader *shader);
   private:
     static const GLfloat VBO[];

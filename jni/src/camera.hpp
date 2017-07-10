@@ -16,6 +16,8 @@ class Camera {
     void updateView();
     glm::vec3 position;
     glm::mat4 projection;
+    glm::mat4 projection2D;
+    glm::vec2 canvas2D;
     glm::mat4 view;
     glm::vec3 front;
     glm::vec3 right;

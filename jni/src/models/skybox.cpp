@@ -1,6 +1,6 @@
 #include "skybox.hpp"
 
-const GLfloat Skybox::VBO[] = {
+const GLfloat SkyboxModel::VBO[] = {
   /* X     Y      Z */
   /* Front */
   1.0f, -1.0f,  1.0f,
@@ -39,9 +39,9 @@ const GLfloat Skybox::VBO[] = {
    1.0f,  1.0f, -1.0f,
 };
 
-const GLsizei Skybox::VBOSIZE = sizeof(Skybox::VBO);
+const GLsizei SkyboxModel::VBOSIZE = sizeof(SkyboxModel::VBO);
 
-const GLushort Skybox::EBO[] = {
+const GLushort SkyboxModel::EBO[] = {
   0, 1, 2,      2, 3, 0,
   4, 5, 6,      6, 7, 4,
   8, 9, 10,     10, 11, 8,
@@ -50,12 +50,12 @@ const GLushort Skybox::EBO[] = {
   20, 21, 22,   22, 23, 20,
 };
 
-const GLsizei Skybox::EBOSIZE = sizeof(Skybox::EBO);
-const GLsizei Skybox::EBOCOUNT = sizeof(Skybox::EBO) / sizeof(GLushort);
+const GLsizei SkyboxModel::EBOSIZE = sizeof(SkyboxModel::EBO);
+const GLsizei SkyboxModel::EBOCOUNT = sizeof(SkyboxModel::EBO) / sizeof(GLushort);
 
-const char Skybox::TEXTURE[] = "skybox";
+const char SkyboxModel::TEXTURE[] = "skybox";
 
-void Skybox::init(Shader *shader) {
+void SkyboxModel::init(Shader *shader) {
   Model::init(shader);
   glUseProgram(shader->program);
   glEnableVertexAttribArray(shader->position);

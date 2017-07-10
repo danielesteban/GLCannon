@@ -37,8 +37,10 @@ void Shader::init() {
   glLinkProgram(program);
 
   position = glGetAttribLocation(program, "position");
+  normal = glGetAttribLocation(program, "normal");
   uv = glGetAttribLocation(program, "uv");
   projection = glGetUniformLocation(program, "projection");
   view = glGetUniformLocation(program, "view");
   texture = glGetUniformLocation(program, "texture");
+  albedo = glGetUniformLocation(program, "albedo");
 }

@@ -22,10 +22,10 @@ class Mesh {
     void setRotation(const btQuaternion rotation);
     void applyImpulse(const btVector3 impulse);
   protected:
+    Model *model;
+    btTransform transform;
     void updateView();
   private:
-    Model *model;
     btRigidBody *body;
-    btTransform transform;
     glm::mat4 view;
 };

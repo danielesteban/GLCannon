@@ -21,7 +21,7 @@ void Mesh::init(btDiscreteDynamicsWorld *world, Model *model, const btVector3 po
 }
 
 void Mesh::render(const Camera *camera) {
-  model->render(glm::value_ptr(camera->view * view));
+  model->render(glm::value_ptr(camera ? (camera->view * view) : view));
 }
 
 void Mesh::setPosition(const btVector3 position) {

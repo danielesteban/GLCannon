@@ -2,9 +2,9 @@
 
 #include "model.hpp"
 
-class Skybox : public Model {
+class SkyboxModel : public Model {
   public:
-    Skybox() : Model(VBO, VBOSIZE, EBO, EBOSIZE, EBOCOUNT, TEXTURE, GL_TEXTURE_CUBE_MAP) {}
+    SkyboxModel() : Model(VBO, VBOSIZE, EBO, EBOSIZE, EBOCOUNT, TEXTURE, GL_TEXTURE_CUBE_MAP) {}
     void init(Shader *shader);
   private:
     static const GLfloat VBO[];

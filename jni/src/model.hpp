@@ -15,13 +15,13 @@ class Model {
       const GLushort EBO[],
       const GLsizei EBOSIZE,
       const GLsizei EBOCOUNT,
-      const char *TEXTURE,
+      const char *TEXTURE = NULL,
       const GLenum TEXTURETARGET = GL_TEXTURE_2D
     );
     virtual void init(Shader *shader);
+    void initTexture(SDL_Surface *surface = NULL);
     void render(const GLfloat *view);
     btCollisionShape *collision;
-  protected:
     Shader *shader;
   private:
     GLuint vao;

@@ -29,6 +29,8 @@ void Camera::processInput(float dx, float dy) {
 void Camera::resize(int w, int h) {
   const float aspect = (float) w / (float) h;
   projection = glm::perspective(glm::radians(60.0f), aspect, 0.1f, 512.0f);
+  canvas2D = glm::vec2(1024.0f, (float) h * 1024.0f / (float) w);
+  projection2D = glm::ortho(0.0f, canvas2D[0], 0.0f, canvas2D[1]);
   updateView();
 }
 

@@ -10,10 +10,12 @@ class Shader {
     void init();
     GLuint program;
     GLint position;
+    GLint normal;
     GLint uv;
     GLint projection;
     GLint view;
     GLint texture;
+    GLint albedo;
   private:
     const char *vertex_src;
     const char *fragment_src;
