@@ -50,7 +50,7 @@ void init() {
   SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
   SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, FSAA);
   SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
-  gWindow = SDL_CreateWindow("GLTest", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 0, 0, SDL_WINDOW_OPENGL);
+  gWindow = SDL_CreateWindow("GLCannon", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 0, 0, SDL_WINDOW_OPENGL);
   gContext = SDL_GL_CreateContext(gWindow);
   glEnable(GL_CULL_FACE);
   glEnable(GL_DEPTH_TEST);
@@ -95,13 +95,13 @@ void resize() {
 void spawnCube(btScalar force) {
   Mesh cube;
   const glm::vec3 origin = camera.position + camera.front;
-  cube.init(world, &cubeModel, btVector3(origin[0], origin[1], origin[2]), btScalar(1.0f));
+  cube.init(world, &cubeModel, btVector3(origin[0], origin[1], origin[2]), btScalar(5.0f));
   cube.setRotation(btQuaternion(btVector3(
     ((float) rand() / (float) RAND_MAX) - 0.5f,
     ((float) rand() / (float) RAND_MAX) - 0.5f,
     ((float) rand() / (float) RAND_MAX) - 0.5f
   ), btScalar(glm::radians((float) (rand() % 360)))));
-  cube.applyImpulse(btVector3(camera.front[0], camera.front[1], camera.front[2]) * force);
+  cube.applyImpulse(btVector3(camera.front[0], camera.front[1], camera.front[2]) * 64.0f * force);
   cubes.push_back(cube);
 }
 
@@ -116,7 +116,7 @@ void processTouch(const Uint32 event, const int finger, const float x, const flo
       (event == SDL_FINGERMOTION && !hoverFire)
     )
   ) {
-    spawnCube(fireButton.getForce() * 32.0f);
+    spawnCube(fireButton.getForce());
     fireButton.setFiring(false);
     firingFinger = -1;
   }
@@ -126,7 +126,7 @@ void processTouch(const Uint32 event, const int finger, const float x, const flo
   }
   if (finger == firingFinger) return;
 
-  if (event == SDL_FINGERDOWN && motionFinger == -1) {
+  if ((event == SDL_FINGERDOWN || event == SDL_FINGERMOTION) && motionFinger == -1) {
     motionFinger = finger;
   }
   if (event == SDL_FINGERMOTION && finger == motionFinger) {
@@ -142,10 +142,18 @@ void setupScene() {
   cubeModel.init(&standardShader);
   groundModel.init(&standardShader);
   fireButtonModel.init(&buttonShader, "fire");
+
   ground.init(world, &groundModel, btVector3(0.0f, -1.0f, 0.0f));
   skyboxModel.init(&skyboxShader);
   skybox.init(NULL, &skyboxModel, btVector3(camera.position[0], camera.position[1], camera.position[2]));
   fireButton.init(&fireButtonModel, btVector3(camera.canvas2D[0] - 96.0f, 96.0f, 0.0f));
+
+  for (int x = -3; x < 3; x += 1)
+  for (int y = 0; y < 5; y += 1) {
+    Mesh cube;
+    cube.init(world, &cubeModel, btVector3((float) x, (float) y + 0.5f, -5.0f), btScalar(5.0f));
+    cubes.push_back(cube);
+  }
 }
 
 void simulateScene(const btScalar delta) {

@@ -1,6 +1,6 @@
-package com.gatunes.gltest;
+package com.gatunes.glcannon;
 import org.libsdl.app.SDLActivity;
-public class gltestActivity extends SDLActivity {
+public class GLCannonActivity extends SDLActivity {
   protected String[] getLibraries() {
       return new String[] {
           "SDL2",

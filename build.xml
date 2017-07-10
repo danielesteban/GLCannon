@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="com.gatunes.gltest" default="help">
+<project name="com.gatunes.glcannon" default="help">
   <property file="local.properties" />
   <property environment="env" />
   <condition property="sdk.dir" value="${env.ANDROID_HOME}">
