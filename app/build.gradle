@@ -11,6 +11,11 @@ android {
     ndk {
       abiFilters 'armeabi-v7a'
     }
+    externalNativeBuild {
+      ndkBuild {
+        arguments "-j6"
+      }
+    }
   }
 
   buildTypes {
