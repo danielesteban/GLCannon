@@ -25,3 +25,10 @@ android {
     }
   }
 }
+
+task runDebug (type: Exec, dependsOn: 'installDebug') {
+  commandLine android.getAdbExe().toString(), "shell",
+  "monkey",
+  "-p", "com.gatunes.glcannon",
+  "-c", "android.intent.category.LAUNCHER", "1"
+}
