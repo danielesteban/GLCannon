@@ -13,7 +13,7 @@ android {
     }
     externalNativeBuild {
       ndkBuild {
-        arguments "-j6"
+        arguments "NDK_DEBUG=0", "-j6"
       }
     }
   }
