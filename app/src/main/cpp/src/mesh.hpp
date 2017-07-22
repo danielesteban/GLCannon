@@ -6,6 +6,7 @@
 #include <SDL_opengles2.h>
 #include <btBulletDynamicsCommon.h>
 #include <glm.hpp>
+#include <gtc/matrix_inverse.hpp>
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
 #include <gtc/quaternion.hpp>
@@ -28,4 +29,5 @@ class Mesh {
   private:
     btRigidBody *body;
     glm::mat4 view;
+    glm::mat3 normalView;
 };

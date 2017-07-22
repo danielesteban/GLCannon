@@ -21,7 +21,7 @@ void Mesh::init(btDiscreteDynamicsWorld *world, Model *model, const btVector3 po
 }
 
 void Mesh::render(const Camera *camera) {
-  model->render(glm::value_ptr(camera ? (camera->view * view) : view));
+  model->render(glm::value_ptr(camera ? (camera->view * view) : view), glm::value_ptr(normalView));
 }
 
 void Mesh::setPosition(const btVector3 position) {
@@ -43,6 +43,7 @@ void Mesh::applyImpulse(const btVector3 impulse) {
 
 void Mesh::updateView() {
   transform.getOpenGLMatrix(glm::value_ptr(view));
+  normalView = glm::inverseTranspose(glm::mat3(view));
 }
 
 void Mesh::simulate(const btScalar delta) {

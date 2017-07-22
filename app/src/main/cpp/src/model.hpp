@@ -22,7 +22,7 @@ class Model {
     );
     virtual void init(Shader *shader);
     void initTexture();
-    void render(const GLfloat *view);
+    void render(const GLfloat *view, const GLfloat *normalView);
     btCollisionShape *collision;
     Shader *shader;
     const char *textureFilename;

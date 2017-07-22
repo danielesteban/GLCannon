@@ -75,8 +75,11 @@ void Model::initTexture() {
   glBindTexture(textureTarget, 0);
 }
 
-void Model::render(const GLfloat *view) {
+void Model::render(const GLfloat *view, const GLfloat *normalView) {
   glUniformMatrix4fv(shader->view, 1, GL_FALSE, view);
+  if (shader->normalView != -1) {
+    glUniformMatrix3fv(shader->normalView, 1, GL_FALSE, normalView);
+  }
   if (texture != 0) {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(textureTarget, texture);

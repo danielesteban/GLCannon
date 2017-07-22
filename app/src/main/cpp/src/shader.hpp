@@ -14,6 +14,7 @@ class Shader {
     GLint uv;
     GLint projection;
     GLint view;
+    GLint normalView;
     GLint texture;
     GLint albedo;
   private:
