@@ -1,7 +1,6 @@
 #pragma once
 
 #include <SDL.h>
-#include <SDL_image.h>
 #define GL_GLEXT_PROTOTYPES 1
 #include <SDL_opengles2.h>
 #include <btBulletDynamicsCommon.h>
@@ -27,6 +26,8 @@ class Mesh {
     virtual void render(const Camera *camera);
     virtual void simulate(const btScalar delta);
     void reset();
+    const btVector3 getPosition();
+    const btQuaternion getRotation();
     void setPosition(const btVector3 position);
     void setRotation(const btQuaternion rotation);
     void applyImpulse(const btVector3 impulse);

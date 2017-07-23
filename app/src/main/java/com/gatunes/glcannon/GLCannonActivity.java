@@ -5,6 +5,7 @@ public class GLCannonActivity extends SDLActivity {
       return new String[] {
           "SDL2",
           "SDL2_image",
+          "SDL2_mixer",
           "Bullet",
           "main"
       };

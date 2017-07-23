@@ -1,3 +1,8 @@
+#include <SDL.h>
+#include <SDL_image.h>
+#include <SDL_mixer.h>
+#define GL_GLEXT_PROTOTYPES 1
+#include <SDL_opengles2.h>
 #include <imgui.h>
 #include <imgui_impl_sdl_gles.h>
 #include <vector>
@@ -25,6 +30,9 @@ int width = 0;
 int height = 0;
 
 Camera camera;
+const glm::vec3 sunPosition = glm::vec3(
+  -0.1, 0.9, -1.0
+);
 
 ButtonShader buttonShader;
 StandardShader standardShader;
@@ -56,11 +64,14 @@ btBroadphaseInterface *overlappingPairCache;
 btSequentialImpulseConstraintSolver *solver;
 btDiscreteDynamicsWorld *world;
 
-unsigned int lastShootTicks = 0;
+Mix_Chunk *cannonSound = NULL;
+float explodingSceneTimer;
+bool explodingScene = false;
 
 void resize();
 void init() {
-  SDL_Init(SDL_INIT_VIDEO);
+  SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO);
+  Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
@@ -77,8 +88,14 @@ void init() {
   SDL_GL_SetSwapInterval(1);
   for (int i = 0; i < sizeof(shaders) / sizeof(Shader*); i += 1) {
     shaders[i]->init();
+    if (shaders[i]->sunPosition != -1) {
+      glUseProgram(shaders[i]->program);
+      glUniform3fv(shaders[i]->sunPosition, 1, glm::value_ptr(sunPosition));
+    }
   }
   resize();
+
+  cannonSound = Mix_LoadWAV("cannon.ogg");
 
   collisionConfiguration = new btDefaultCollisionConfiguration();
   dispatcher = new btCollisionDispatcher(collisionConfiguration);
@@ -110,12 +127,27 @@ void resize() {
   }
 }
 
+void explodeScene() {
+  explodingScene = true;
+  explodingSceneTimer = 3.5f;
+  for (std::vector<Mesh>::iterator cube = cubes.begin(); cube != cubes.end(); ++cube) {
+    const btVector3 position = (*cube).getPosition();
+    const float force = 64.0f + (float) ((rand() % 101) - 50);
+    (*cube).applyImpulse(btVector3(position.x() * 6.0f, std::max(std::abs(position.x()), std::abs(position.z())) * 2.0f, position.z() * 2.0f).normalize() * force);
+  }
+  for (std::vector<Sphere>::iterator sphere = spheres.begin(); sphere != spheres.end(); ++sphere) {
+    (*sphere).destroy();
+  }
+  spheres.clear();
+}
+
 void spawnSphere(btScalar force) {
   Sphere sphere;
-  const glm::vec3 origin = camera.position + camera.front;
-  sphere.init(world, &sphereModel, btVector3(origin[0], origin[1], origin[2]));
+  sphere.init(world, &sphereModel, btVector3(camera.position[0], camera.position[1], camera.position[2]));
   sphere.applyImpulse(btVector3(camera.front[0], camera.front[1], camera.front[2]) * 64.0f * force);
   spheres.push_back(sphere);
+  int channel = Mix_PlayChannel(-1, cannonSound, 0);
+  if (channel != -1) Mix_Volume(channel, (int) ((float) MIX_MAX_VOLUME * 0.7f * force));
 }
 
 int firingFinger = -1;
@@ -129,12 +161,15 @@ void processTouch(const Uint32 event, const int finger, const float x, const flo
       (event == SDL_FINGERMOTION && !hoverFire)
     )
   ) {
-    lastShootTicks = SDL_GetTicks();
     spawnSphere(fireButton.getForce());
     fireButton.setFiring(false);
     firingFinger = -1;
   }
-  if (!fireButton.isFiring() && hoverFire && event == SDL_FINGERDOWN && spheres.size() < NUM_SHOTS) {
+  if (!explodingScene && !fireButton.isFiring() && hoverFire && event == SDL_FINGERDOWN) {
+    if (spheres.size() >= NUM_SHOTS) {
+      explodeScene();
+      return;
+    }
     fireButton.setFiring(true);
     firingFinger = finger;
   }
@@ -152,13 +187,16 @@ void processTouch(const Uint32 event, const int finger, const float x, const flo
 }
 
 void resetScene() {
+  explodingScene = false;
   for (std::vector<Mesh>::iterator cube = cubes.begin(); cube != cubes.end(); ++cube) {
     (*cube).reset();
   }
-  for (std::vector<Sphere>::iterator sphere = spheres.begin(); sphere != spheres.end(); ++sphere) {
-    (*sphere).destroy();
+  if (!spheres.empty()) {
+    for (std::vector<Sphere>::iterator sphere = spheres.begin(); sphere != spheres.end(); ++sphere) {
+      (*sphere).destroy();
+    }
+    spheres.clear();
   }
-  spheres.clear();
 }
 
 void setupScene() {
@@ -189,8 +227,11 @@ void setupScene() {
 
 void simulateScene(const btScalar delta) {
   world->stepSimulation(delta, 4);
-  if (spheres.size() >= NUM_SHOTS && lastShootTicks + 1500 < SDL_GetTicks()) {
-    resetScene();
+  if (explodingScene) {
+    explodingSceneTimer -= delta;
+    if (explodingSceneTimer <= 0.0f) {
+      resetScene();
+    }
   }
   for (std::vector<Mesh>::iterator cube = cubes.begin(); cube != cubes.end(); ++cube) {
     (*cube).simulate(delta);

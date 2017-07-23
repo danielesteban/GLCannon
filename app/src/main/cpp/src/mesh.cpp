@@ -51,6 +51,13 @@ void Mesh::reset() {
   updateView();
 }
 
+const btVector3 Mesh::getPosition() {
+  return transform.getOrigin();
+}
+const btQuaternion Mesh::getRotation() {
+  return transform.getRotation();
+}
+
 void Mesh::setPosition(const btVector3 position) {
   transform.setOrigin(position);
   body->setWorldTransform(transform);

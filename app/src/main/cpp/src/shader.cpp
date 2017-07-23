@@ -44,4 +44,5 @@ void Shader::init() {
   normalView = glGetUniformLocation(program, "normalView");
   texture = glGetUniformLocation(program, "texture");
   albedo = glGetUniformLocation(program, "albedo");
+  sunPosition = glGetUniformLocation(program, "sunPosition");
 }
