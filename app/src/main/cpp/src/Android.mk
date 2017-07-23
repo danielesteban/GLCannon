@@ -19,9 +19,9 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SDL_PATH)/include \
 LOCAL_SRC_FILES := $(SDL_PATH)/src/main/android/SDL_android_main.c \
 	${IMGUI_PATH}/imgui.cpp ${IMGUI_PATH}/imgui_draw.cpp ${IMGUI_PATH}/imgui_impl_sdl_gles.cpp \
 	camera.cpp mesh.cpp model.cpp shader.cpp \
-	meshes/button.cpp \
-	models/button.cpp models/cube.cpp models/ground.cpp models/skybox.cpp \
-	shaders/button.cpp shaders/standard.cpp shaders/skybox.cpp \
+	meshes/button.cpp meshes/sphere.cpp \
+	models/button.cpp models/cube.cpp models/ground.cpp models/skybox.cpp models/sphere.cpp \
+	shaders/button.cpp shaders/standard.cpp shaders/skybox.cpp shaders/sphere.cpp \
 	main.cpp
 
 LOCAL_SHARED_LIBRARIES := SDL2 SDL2_image Bullet

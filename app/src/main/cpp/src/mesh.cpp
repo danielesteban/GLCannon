@@ -2,6 +2,7 @@
 
 void Mesh::init(btDiscreteDynamicsWorld *world, Model *model, const btVector3 position, const btScalar mass) {
   this->model = model;
+  this->world = world;
   transform.setIdentity();
   transform.setOrigin(btVector3(position[0], position[1], position[2]));
   if (model->collision != NULL) {
@@ -18,6 +19,14 @@ void Mesh::init(btDiscreteDynamicsWorld *world, Model *model, const btVector3 po
     body = NULL;
   }
   updateView();
+}
+
+void Mesh::destroy() {
+  if (body != NULL) {
+    world->removeRigidBody(body);
+    delete body->getMotionState();
+    delete body;
+  }
 }
 
 void Mesh::render(const Camera *camera) {

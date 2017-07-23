@@ -17,6 +17,7 @@
 class Mesh {
   public:
     virtual void init(btDiscreteDynamicsWorld *world, Model *model, const btVector3 position, const btScalar mass = btScalar(0.0f));
+    virtual void destroy();
     virtual void render(const Camera *camera);
     virtual void simulate(const btScalar delta);
     void setPosition(const btVector3 position);
@@ -28,6 +29,7 @@ class Mesh {
     void updateView();
   private:
     btRigidBody *body;
+    btDiscreteDynamicsWorld *world;
     glm::mat4 view;
     glm::mat3 normalView;
 };
