@@ -1,10 +1,18 @@
 #include "mesh.hpp"
 
-void Mesh::init(btDiscreteDynamicsWorld *world, Model *model, const btVector3 position, const btScalar mass) {
+void Mesh::init(
+  btDiscreteDynamicsWorld *world,
+  Model *model,
+  const btVector3 position,
+  const btQuaternion rotation,
+  const btScalar mass
+) {
   this->model = model;
   this->world = world;
   transform.setIdentity();
-  transform.setOrigin(btVector3(position[0], position[1], position[2]));
+  transform.setOrigin(position);
+  transform.setRotation(rotation);
+  initialTransform = btTransform(transform);
   if (model->collision != NULL) {
     bool isDynamic = (mass != 0.f);
     btVector3 localInertia(0, 0, 0);
@@ -33,15 +41,27 @@ void Mesh::render(const Camera *camera) {
   model->render(glm::value_ptr(camera ? (camera->view * view) : view), glm::value_ptr(normalView));
 }
 
+void Mesh::reset() {
+  transform = btTransform(initialTransform);
+  body->clearForces();
+  body->setLinearVelocity(btVector3(0, 0, 0));
+  body->setAngularVelocity(btVector3(0, 0, 0));
+  body->setWorldTransform(transform);
+  body->getMotionState()->setWorldTransform(transform);
+  updateView();
+}
+
 void Mesh::setPosition(const btVector3 position) {
   transform.setOrigin(position);
   body->setWorldTransform(transform);
+  body->getMotionState()->setWorldTransform(transform);
   updateView();
 }
 
 void Mesh::setRotation(const btQuaternion rotation) {
   transform.setRotation(rotation);
   body->setWorldTransform(transform);
+  body->getMotionState()->setWorldTransform(transform);
   updateView();
 }
 

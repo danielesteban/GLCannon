@@ -16,7 +16,7 @@
 #include "shaders/standard.hpp"
 
 #define FSAA 2
-#define MAX_SPHERES 10
+#define NUM_SHOTS 10
 
 SDL_Window *gWindow = NULL;
 SDL_GLContext gContext;
@@ -55,6 +55,8 @@ btCollisionDispatcher *dispatcher;
 btBroadphaseInterface *overlappingPairCache;
 btSequentialImpulseConstraintSolver *solver;
 btDiscreteDynamicsWorld *world;
+
+unsigned int lastShootTicks = 0;
 
 void resize();
 void init() {
@@ -109,12 +111,6 @@ void resize() {
 }
 
 void spawnSphere(btScalar force) {
-  if (spheres.size() > MAX_SPHERES) {
-    std::vector<Sphere>::iterator sphere = spheres.begin();
-    (*sphere).destroy();
-    spheres.erase(sphere);
-  }
-
   Sphere sphere;
   const glm::vec3 origin = camera.position + camera.front;
   sphere.init(world, &sphereModel, btVector3(origin[0], origin[1], origin[2]));
@@ -133,11 +129,12 @@ void processTouch(const Uint32 event, const int finger, const float x, const flo
       (event == SDL_FINGERMOTION && !hoverFire)
     )
   ) {
+    lastShootTicks = SDL_GetTicks();
     spawnSphere(fireButton.getForce());
     fireButton.setFiring(false);
     firingFinger = -1;
   }
-  if (!fireButton.isFiring() && hoverFire && event == SDL_FINGERDOWN) {
+  if (!fireButton.isFiring() && hoverFire && event == SDL_FINGERDOWN && spheres.size() < NUM_SHOTS) {
     fireButton.setFiring(true);
     firingFinger = finger;
   }
@@ -152,6 +149,16 @@ void processTouch(const Uint32 event, const int finger, const float x, const flo
   if (event == SDL_FINGERUP && finger == motionFinger) {
     motionFinger = -1;
   }
+}
+
+void resetScene() {
+  for (std::vector<Mesh>::iterator cube = cubes.begin(); cube != cubes.end(); ++cube) {
+    (*cube).reset();
+  }
+  for (std::vector<Sphere>::iterator sphere = spheres.begin(); sphere != spheres.end(); ++sphere) {
+    (*sphere).destroy();
+  }
+  spheres.clear();
 }
 
 void setupScene() {
@@ -169,13 +176,16 @@ void setupScene() {
   for (int x = -3; x < 3; x += 1)
   for (int y = 0; y < 5; y += 1) {
     Mesh cube;
-    cube.init(world, &cubeModel, btVector3((float) x + 0.5f, (float) y + 0.5f, -5.0f), btScalar(5.0f));
+    cube.init(world, &cubeModel, btVector3((float) x + 0.5f, (float) y + 0.5f, -5.0f), btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btScalar(5.0f));
     cubes.push_back(cube);
   }
 }
 
 void simulateScene(const btScalar delta) {
   world->stepSimulation(delta, 4);
+  if (spheres.size() >= NUM_SHOTS && lastShootTicks + 3000 < SDL_GetTicks()) {
+    resetScene();
+  }
   for (std::vector<Mesh>::iterator cube = cubes.begin(); cube != cubes.end(); ++cube) {
     (*cube).simulate(delta);
   }

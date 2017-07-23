@@ -16,10 +16,17 @@
 
 class Mesh {
   public:
-    virtual void init(btDiscreteDynamicsWorld *world, Model *model, const btVector3 position, const btScalar mass = btScalar(0.0f));
+    virtual void init(
+      btDiscreteDynamicsWorld *world,
+      Model *model,
+      const btVector3 position = btVector3(),
+      const btQuaternion rotation = btQuaternion(0.0f, 0.0f, 0.0f, 1.0f),
+      const btScalar mass = btScalar(0.0f)
+    );
     virtual void destroy();
     virtual void render(const Camera *camera);
     virtual void simulate(const btScalar delta);
+    void reset();
     void setPosition(const btVector3 position);
     void setRotation(const btQuaternion rotation);
     void applyImpulse(const btVector3 impulse);
@@ -28,6 +35,7 @@ class Mesh {
     btTransform transform;
     void updateView();
   private:
+    btTransform initialTransform;
     btRigidBody *body;
     btDiscreteDynamicsWorld *world;
     glm::mat4 view;
