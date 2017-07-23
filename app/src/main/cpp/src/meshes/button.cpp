@@ -2,7 +2,7 @@
 
 void Button::init(Model *model, const btVector3 position) {
   Mesh::init(NULL, model, position);
-  albedo = glm::vec4(0.1f, 0.1f, 0.1f, 0.9f);
+  albedo = glm::vec4(0.0f, 0.0f, 0.0f, 0.9f);
 }
 
 bool Button::isHover(const float x, const float y) {
@@ -35,7 +35,7 @@ void Button::simulate(const btScalar delta) {
       raising = true;
     }
   }
-  albedo[0] = fmin(fmax(force, 0.1f), 1.0f);
+  albedo[0] = fmin(force, 1.0f);
 }
 
 bool Button::isFiring() {
@@ -46,7 +46,7 @@ void Button::setFiring(const bool state) {
   firing = state;
   raising = true;
   force = 0.0f;
-  albedo[0] = 0.1f;
+  albedo[0] = 0.0f;
 }
 
 btScalar Button::getForce() {

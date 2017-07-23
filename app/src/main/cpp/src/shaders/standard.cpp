@@ -27,7 +27,7 @@ const char *StandardShader::FRAGMENT =
 " const float density = 0.03; "
 " const vec4 fog = vec4(0.8, 0.658, 0.407, 1.0); "
 " const float ambientFactor = 0.15; "
-" const vec3 lightPosition = vec3(-0.2, 0.8, -1.0); "
+" const vec3 lightPosition = vec3(-0.1, 0.9, -1.0); "
 " void main() { "
 "   float distance = length(fragmentPosition); "
 "   float fogFactor = clamp(exp2(-density * density * distance * distance * LOG2), 0.0, 1.0); "
