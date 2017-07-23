@@ -1,17 +1,17 @@
 #include "button.hpp"
 
 const GLfloat ButtonModel::VBO[] = {
-  /* X       Y         U      V */
-  -64.0f, -64.0f,     0.0f,  1.0f,
-   64.0f, -64.0f,     1.0f,  1.0f,
-   64.0f,  64.0f,     1.0f,  0.0f,
-  -64.0f,  64.0f,     0.0f,  0.0f,
+   64.00000f,  64.00000f,     0.000000f,  1.000000f,
+  -64.00000f,  64.00000f,     1.000000f,  1.000000f,
+  -64.00000f, -64.00000f,     1.000000f,  0.000000f,
+   64.00000f, -64.00000f,     0.000000f,  0.000000f,
 };
 
 const GLsizei ButtonModel::VBOSIZE = sizeof(ButtonModel::VBO);
 
 const GLushort ButtonModel::EBO[] = {
-  0, 1, 2,      2, 3, 0,
+  0,    1,    2,
+  0,    2,    3,
 };
 
 const GLsizei ButtonModel::EBOSIZE = sizeof(ButtonModel::EBO);
