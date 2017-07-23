@@ -173,10 +173,16 @@ void setupScene() {
   skybox.init(NULL, &skyboxModel, btVector3(camera.position[0], camera.position[1], camera.position[2]));
   fireButton.init(&fireButtonModel, btVector3(camera.canvas2D[0] - 96.0f, 96.0f, 0.0f));
 
-  for (int x = -3; x < 3; x += 1)
+  for (int x = -3; x < 4; x += 1)
   for (int y = 0; y < 5; y += 1) {
     Mesh cube;
-    cube.init(world, &cubeModel, btVector3((float) x + 0.5f, (float) y + 0.5f, 5.0f), btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btScalar(5.0f));
+    const float offset = (float) x * 1.12f;
+    const btVector3 position = btVector3(offset, (float) y + 0.5f, 8.0f - std::exp(std::abs((float) x)) * 0.18f);
+    const btQuaternion rotation = btQuaternion(
+      btVector3(0.0f, 1.0f, 0.0f),
+      glm::radians(offset * 14.0f)
+    );
+    cube.init(world, &cubeModel, position, rotation, btScalar(5.0f));
     cubes.push_back(cube);
   }
 }
