@@ -73,7 +73,7 @@ void init() {
   glEnable(GL_DEPTH_TEST);
   glBlendEquation(GL_FUNC_ADD);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glClearColor(0.04f, 0.08f, 0.14f, 1.0f);
+  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   SDL_GL_SetSwapInterval(1);
   for (int i = 0; i < sizeof(shaders) / sizeof(Shader*); i += 1) {
     shaders[i]->init();
@@ -176,14 +176,14 @@ void setupScene() {
   for (int x = -3; x < 3; x += 1)
   for (int y = 0; y < 5; y += 1) {
     Mesh cube;
-    cube.init(world, &cubeModel, btVector3((float) x + 0.5f, (float) y + 0.5f, -5.0f), btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btScalar(5.0f));
+    cube.init(world, &cubeModel, btVector3((float) x + 0.5f, (float) y + 0.5f, 5.0f), btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btScalar(5.0f));
     cubes.push_back(cube);
   }
 }
 
 void simulateScene(const btScalar delta) {
   world->stepSimulation(delta, 4);
-  if (spheres.size() >= NUM_SHOTS && lastShootTicks + 3000 < SDL_GetTicks()) {
+  if (spheres.size() >= NUM_SHOTS && lastShootTicks + 1500 < SDL_GetTicks()) {
     resetScene();
   }
   for (std::vector<Mesh>::iterator cube = cubes.begin(); cube != cubes.end(); ++cube) {

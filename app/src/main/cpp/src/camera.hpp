@@ -25,5 +25,10 @@ class Camera {
   private:
     float tilt;
     float pitch;
+    static const float fov;
+    static const float maxTilt;
+    static const float maxPitch;
+    static const float sensitivity;
     static const glm::vec3 worldUp;
+
 };
