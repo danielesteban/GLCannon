@@ -137,6 +137,11 @@ void resize() {
   }
 }
 
+void playSound(Mix_Chunk *sound, const float volume) {
+  int channel = Mix_PlayChannel(-1, sound, 0);
+  if (channel != -1) Mix_Volume(channel, (int) ((float) MIX_MAX_VOLUME * volume));
+}
+
 void explodeScene() {
   explodingScene = true;
   explodingSceneTimer = 3.5f;
@@ -149,6 +154,7 @@ void explodeScene() {
     (*sphere).destroy();
   }
   spheres.clear();
+  playSound(cannonSound, 1.0f);
 }
 
 void spawnSphere(btScalar force) {
@@ -156,12 +162,12 @@ void spawnSphere(btScalar force) {
     spheres.front().destroy();
     spheres.erase(spheres.begin());
   }
+  const btScalar power = btScalar(menu.getActiveItem() + 1);
   Sphere sphere;
   sphere.init(world, &sphereModel, btVector3(camera.position[0], camera.position[1], camera.position[2]));
-  sphere.applyImpulse(btVector3(camera.front[0], camera.front[1], camera.front[2]) * 64.0f * force);
+  sphere.applyImpulse(btVector3(camera.front[0], camera.front[1], camera.front[2]) * 50.0f * power * force);
   spheres.push_back(sphere);
-  int channel = Mix_PlayChannel(-1, cannonSound, 0);
-  if (channel != -1) Mix_Volume(channel, (int) ((float) MIX_MAX_VOLUME * 0.7f * force));
+  playSound(cannonSound, 0.2f * power * force);
 }
 
 int firingFinger = -1;

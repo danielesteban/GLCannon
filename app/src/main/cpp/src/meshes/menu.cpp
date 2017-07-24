@@ -2,7 +2,7 @@
 
 void Menu::init(MenuModel *model, const btScalar y) {
   isCollapsed = true;
-  activeItem = 0;
+  activeItem = 1;
   width = (float) model->getNumItems() * MenuModel::itemSize;
   targetPosition = btVector3((width - MenuModel::itemSize) * -1.0f, y, 0.0f);
   Mesh::init(NULL, (Model *) model, targetPosition);
