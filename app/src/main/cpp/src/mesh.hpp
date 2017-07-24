@@ -23,7 +23,7 @@ class Mesh {
       const btScalar mass = btScalar(0.0f)
     );
     virtual void destroy();
-    virtual void render(const Camera *camera);
+    virtual void render(const Camera *camera = NULL);
     virtual void simulate(const btScalar delta);
     void reset();
     const btVector3 getPosition();

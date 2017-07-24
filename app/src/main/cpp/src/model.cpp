@@ -1,9 +1,9 @@
 #include "model.hpp"
 
 Model::Model(
-  const GLfloat *VBO,
+  const GLfloat VBO[],
   const GLsizei VBOSIZE,
-  const GLushort *EBO,
+  const GLushort EBO[],
   const GLsizei EBOSIZE,
   const GLsizei EBOCOUNT,
   const char *TEXTURE,

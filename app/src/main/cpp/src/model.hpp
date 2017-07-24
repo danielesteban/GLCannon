@@ -10,7 +10,7 @@
 class Model {
   public:
     Model(
-      const GLfloat *VBO,
+      const GLfloat VBO[],
       const GLsizei VBOSIZE,
       const GLushort EBO[],
       const GLsizei EBOSIZE,
@@ -25,18 +25,20 @@ class Model {
     void render(const GLfloat *view, const GLfloat *normalView);
     btCollisionShape *collision;
     Shader *shader;
-    const char *textureFilename;
-  private:
-    GLuint vao;
-    GLuint vbo;
+  protected:
+    void updateVBO();
     const GLfloat *vboData;
-    const GLsizei vboSize;
-    GLuint ebo;
+    GLsizei vboSize;
     const GLushort *eboData;
-    const GLsizei eboSize;
-    const GLsizei eboCount;
-    GLuint texture;
+    GLsizei eboSize;
+    GLsizei eboCount;
+    const char *textureFilename;
     const GLenum textureTarget;
     const GLint textureFormat;
     const GLint textureWrap;
+  private:
+    GLuint vao;
+    GLuint vbo;
+    GLuint ebo;
+    GLuint texture;
 };

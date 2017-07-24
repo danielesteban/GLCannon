@@ -43,11 +43,13 @@ void Mesh::render(const Camera *camera) {
 
 void Mesh::reset() {
   transform = btTransform(initialTransform);
-  body->clearForces();
-  body->setLinearVelocity(btVector3(0, 0, 0));
-  body->setAngularVelocity(btVector3(0, 0, 0));
-  body->setWorldTransform(transform);
-  body->getMotionState()->setWorldTransform(transform);
+  if (body != NULL) {
+    body->clearForces();
+    body->setLinearVelocity(btVector3(0, 0, 0));
+    body->setAngularVelocity(btVector3(0, 0, 0));
+    body->setWorldTransform(transform);
+    body->getMotionState()->setWorldTransform(transform);
+  }
   updateView();
 }
 
@@ -60,19 +62,24 @@ const btQuaternion Mesh::getRotation() {
 
 void Mesh::setPosition(const btVector3 position) {
   transform.setOrigin(position);
-  body->setWorldTransform(transform);
-  body->getMotionState()->setWorldTransform(transform);
+  if (body != NULL) {
+    body->setWorldTransform(transform);
+    body->getMotionState()->setWorldTransform(transform);
+  }
   updateView();
 }
 
 void Mesh::setRotation(const btQuaternion rotation) {
   transform.setRotation(rotation);
-  body->setWorldTransform(transform);
-  body->getMotionState()->setWorldTransform(transform);
+  if (body != NULL) {
+    body->setWorldTransform(transform);
+    body->getMotionState()->setWorldTransform(transform);
+  }
   updateView();
 }
 
 void Mesh::applyImpulse(const btVector3 impulse) {
+  if (body == NULL) return;
   body->activate(true);
   body->applyCentralImpulse(impulse);
 }

@@ -6,9 +6,9 @@ void Button::init(Model *model, const btVector3 position) {
 }
 
 bool Button::isHover(const float x, const float y) {
-  const btVector3 position = transform.getOrigin();
-  if (x < position.getX() - 128.0f) return false;
-  if (x > position.getX() + 128.0f) return false;
+  const btVector3 position = getPosition();
+  if (x < position.getX() - 64.0f) return false;
+  if (x > position.getX() + 64.0f) return false;
   if (y < position.getY() - 64.0f) return false;
   if (y > position.getY() + 64.0f) return false;
   return true;

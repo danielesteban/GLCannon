@@ -9,19 +9,22 @@
 #include "camera.hpp"
 #include "mesh.hpp"
 #include "meshes/button.hpp"
+#include "meshes/menu.hpp"
 #include "meshes/sphere.hpp"
 #include "models/button.hpp"
 #include "models/cube.hpp"
 #include "models/ground.hpp"
+#include "models/menu.hpp"
 #include "models/skybox.hpp"
 #include "models/sphere.hpp"
 #include "shaders/button.hpp"
+#include "shaders/menu.hpp"
 #include "shaders/skybox.hpp"
 #include "shaders/sphere.hpp"
 #include "shaders/standard.hpp"
 
 #define FSAA 2
-#define NUM_SHOTS 10
+#define MAX_SPHERES 10
 
 SDL_Window *gWindow = NULL;
 SDL_GLContext gContext;
@@ -35,12 +38,14 @@ const glm::vec3 sunPosition = glm::vec3(
 );
 
 ButtonShader buttonShader;
+MenuShader menuShader;
 StandardShader standardShader;
 SkyboxShader skyboxShader;
 SphereShader sphereShader;
 
 Shader *shaders[] = {
   &buttonShader,
+  &menuShader,
   &skyboxShader,
   &sphereShader,
   &standardShader
@@ -49,12 +54,14 @@ Shader *shaders[] = {
 CubeModel cubeModel;
 GroundModel groundModel;
 ButtonModel fireButtonModel;
+MenuModel menuModel;
 SkyboxModel skyboxModel;
 SphereModel sphereModel;
 
 std::vector<Mesh> cubes;
 Button fireButton;
 Mesh ground;
+Menu menu;
 Mesh skybox;
 std::vector<Sphere> spheres;
 
@@ -83,7 +90,7 @@ void init() {
   glEnable(GL_CULL_FACE);
   glEnable(GL_DEPTH_TEST);
   glBlendEquation(GL_FUNC_ADD);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   SDL_GL_SetSwapInterval(1);
   for (int i = 0; i < sizeof(shaders) / sizeof(Shader*); i += 1) {
@@ -120,9 +127,12 @@ void resize() {
   camera.resize(width, height);
   for (int i = 0; i < sizeof(shaders) / sizeof(Shader*); i += 1) {
     glUseProgram(shaders[i]->program);
-    const GLfloat *projection = glm::value_ptr(
-      shaders[i] == &buttonShader ? camera.projection2D : camera.projection
-    );
+    GLfloat *projection;
+    if (shaders[i] == &buttonShader || shaders[i] == &menuShader) {
+      projection = glm::value_ptr(camera.projection2D);
+    } else {
+      projection = glm::value_ptr(camera.projection);
+    }
     glUniformMatrix4fv(shaders[i]->projection, 1, GL_FALSE, projection);
   }
 }
@@ -142,6 +152,10 @@ void explodeScene() {
 }
 
 void spawnSphere(btScalar force) {
+  if (spheres.size() >= MAX_SPHERES) {
+    spheres.front().destroy();
+    spheres.erase(spheres.begin());
+  }
   Sphere sphere;
   sphere.init(world, &sphereModel, btVector3(camera.position[0], camera.position[1], camera.position[2]));
   sphere.applyImpulse(btVector3(camera.front[0], camera.front[1], camera.front[2]) * 64.0f * force);
@@ -151,9 +165,12 @@ void spawnSphere(btScalar force) {
 }
 
 int firingFinger = -1;
+int menuFinger = -1;
 int motionFinger = -1;
 void processTouch(const Uint32 event, const int finger, const float x, const float y, const float dx, const float dy) {
-  const bool hoverFire = fireButton.isHover(x * camera.canvas2D[0], (1.0f - y) * camera.canvas2D[1]);
+  const float UIx = x * camera.canvas2D[0];
+  const float UIy = (1.0f - y) * camera.canvas2D[1];
+  const bool hoverFire = fireButton.isHover(UIx, UIy);
   if (
     fireButton.isFiring() && finger == firingFinger &&
     (
@@ -166,14 +183,27 @@ void processTouch(const Uint32 event, const int finger, const float x, const flo
     firingFinger = -1;
   }
   if (!explodingScene && !fireButton.isFiring() && hoverFire && event == SDL_FINGERDOWN) {
-    if (spheres.size() >= NUM_SHOTS) {
-      explodeScene();
-      return;
-    }
     fireButton.setFiring(true);
     firingFinger = finger;
   }
   if (finger == firingFinger) return;
+
+  const bool hoverMenu = menu.isHover(UIx, UIy);
+  if (hoverMenu && event == SDL_FINGERDOWN) {
+    menuFinger = finger;
+  }
+  if (finger == menuFinger) {
+    if (hoverMenu) {
+      if (event == SDL_FINGERUP) {
+        const int item = menu.click(UIx);
+        if (item == 3 && !explodingScene) {
+          explodeScene();
+        }
+      }
+      return;
+    }
+    menuFinger = -1;
+  }
 
   if ((event == SDL_FINGERDOWN || event == SDL_FINGERMOTION) && motionFinger == -1) {
     motionFinger = finger;
@@ -202,14 +232,16 @@ void resetScene() {
 void setupScene() {
   srand(time(NULL));
   cubeModel.init(&standardShader);
-  groundModel.init(&standardShader);
   fireButtonModel.init(&buttonShader, "fire");
+  groundModel.init(&standardShader);
+  menuModel.init(&menuShader, "menu", 6);
   skyboxModel.init(&skyboxShader);
   sphereModel.init(&sphereShader);
 
-  ground.init(world, &groundModel, btVector3(0.0f, -1.0f, 0.0f));
-  skybox.init(NULL, &skyboxModel, btVector3(camera.position[0], camera.position[1], camera.position[2]));
   fireButton.init(&fireButtonModel, btVector3(camera.canvas2D[0] - 96.0f, 96.0f, 0.0f));
+  ground.init(world, &groundModel, btVector3(0.0f, -1.0f, 0.0f));
+  menu.init(&menuModel, camera.canvas2D[1] - MenuModel::itemSize);
+  skybox.init(NULL, &skyboxModel, btVector3(camera.position[0], camera.position[1], camera.position[2]));
 
   for (int x = -3; x < 4; x += 1)
   for (int y = 0; y < 5; y += 1) {
@@ -233,13 +265,14 @@ void simulateScene(const btScalar delta) {
       resetScene();
     }
   }
+  fireButton.simulate(delta);
+  menu.simulate(delta);
   for (std::vector<Mesh>::iterator cube = cubes.begin(); cube != cubes.end(); ++cube) {
     (*cube).simulate(delta);
   }
   for (std::vector<Sphere>::iterator sphere = spheres.begin(); sphere != spheres.end(); ++sphere) {
     (*sphere).simulate(delta);
   }
-  fireButton.simulate(delta);
 }
 
 void renderScene() {
@@ -262,6 +295,8 @@ void renderUI() {
   glUseProgram(buttonShader.program);
   glEnable(GL_BLEND);
   fireButton.render();
+  glUseProgram(menuShader.program);
+  menu.render();
   glDisable(GL_BLEND);
 
   ImGui_ImplSdlGLES_NewFrame(gWindow);
