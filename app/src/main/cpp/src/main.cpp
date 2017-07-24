@@ -24,7 +24,7 @@
 #include "shaders/standard.hpp"
 
 #define FSAA 2
-#define MAX_SPHERES 10
+#define MAX_SPHERES 16
 
 SDL_Window *gWindow = NULL;
 SDL_GLContext gContext;
