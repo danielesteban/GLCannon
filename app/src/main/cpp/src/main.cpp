@@ -147,7 +147,7 @@ void explodeScene() {
   explodingSceneTimer = 3.5f;
   for (std::vector<Mesh>::iterator cube = cubes.begin(); cube != cubes.end(); ++cube) {
     const btVector3 position = (*cube).getPosition();
-    const float force = 64.0f + (float) ((rand() % 101) - 50);
+    const float force = 80.0f + (float) ((rand() % 101) - 50);
     (*cube).applyImpulse(btVector3(position.x() * 6.0f, std::max(std::abs(position.x()), std::abs(position.z())) * 2.0f, position.z() * 2.0f).normalize() * force);
   }
   for (std::vector<Sphere>::iterator sphere = spheres.begin(); sphere != spheres.end(); ++sphere) {
