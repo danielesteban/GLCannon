@@ -5,6 +5,7 @@
 #include <SDL_opengles2.h>
 #include <imgui.h>
 #include <imgui_impl_sdl_gles.h>
+#include <jni.h>
 #include <vector>
 #include "camera.hpp"
 #include "mesh.hpp"
@@ -170,6 +171,16 @@ void spawnSphere(btScalar force) {
   playSound(cannonSound, 0.2f * power * force);
 }
 
+void openGitHub() {
+  JNIEnv *env = (JNIEnv *)SDL_AndroidGetJNIEnv();
+  jobject activity = (jobject)SDL_AndroidGetActivity();
+  jclass clazz(env->GetObjectClass(activity));
+  jmethodID method_id = env->GetMethodID(clazz, "openGitHub", "()V");
+  env->CallVoidMethod(activity, method_id);
+  env->DeleteLocalRef(activity);
+  env->DeleteLocalRef(clazz);
+}
+
 int firingFinger = -1;
 int menuFinger = -1;
 int motionFinger = -1;
@@ -207,7 +218,7 @@ void processTouch(const Uint32 event, const int finger, const float x, const flo
             if (!explodingScene) explodeScene();
             break;
           case 4:
-            // TODO: button behaviour
+            openGitHub();
             break;
           case 5:
             menu.toggle();
