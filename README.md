@@ -4,9 +4,20 @@
 
 ![Screenshot](screenshot.png)
 
-The main program is at: [app/src/main/cpp/src/](app/src/main/cpp/src/)
+The main program is in:
+* [app/src/main/cpp/src/](app/src/main/cpp/src/)
 
-The rest are just C/C++ libraries and the AndroidStudio boilerplate.
+The assets are stored in:
+* [app/src/main/assets/](app/src/main/assets/)
+
+It makes use of the following libraries:
+* [Bullet](http://bulletphysics.org) in [app/src/main/cpp/bullet/](app/src/main/cpp/bullet/)
+* [GLM](http://glm.g-truc.net) in [app/src/main/cpp/glm/](app/src/main/cpp/glm/)
+* [SDL](https://www.libsdl.org) in [app/src/main/cpp/SDL/](app/src/main/cpp/SDL/)
+* [SDL_image](https://www.libsdl.org/projects/SDL_image/) in [app/src/main/cpp/SDL_image/](app/src/main/cpp/SDL_image/)
+* [SDL_mixer](https://www.libsdl.org/projects/SDL_mixer/) in [app/src/main/cpp/SDL_mixer/](app/src/main/cpp/SDL_mixer/)
+
+The rest is just the Android Studio boilerplate.
 
 ---
 
