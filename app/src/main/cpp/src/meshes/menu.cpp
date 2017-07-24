@@ -45,19 +45,7 @@ void Menu::render(const Camera *camera) {
 const int Menu::click(const float x) {
   const btVector3 position = getPosition();
   const int numItems = ((MenuModel *) model)->getNumItems();
-  const int item = (int) ((x - position.x()) / MenuModel::itemSize);
-  if (item < 0 || item > numItems) return -1;
-  switch (item) {
-    case 3:
-    case 4:
-      break;
-    case 5:
-      toggle();
-      break;
-    default:
-      setActiveItem(item);
-  }
-  return item;
+  return (int) ((x - position.x()) / MenuModel::itemSize);
 }
 
 void Menu::toggle() {

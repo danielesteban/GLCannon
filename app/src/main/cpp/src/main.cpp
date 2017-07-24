@@ -202,8 +202,18 @@ void processTouch(const Uint32 event, const int finger, const float x, const flo
     if (hoverMenu) {
       if (event == SDL_FINGERUP) {
         const int item = menu.click(UIx);
-        if (item == 3 && !explodingScene) {
-          explodeScene();
+        switch (item) {
+          case 3:
+            if (!explodingScene) explodeScene();
+            break;
+          case 4:
+            // TODO: button behaviour
+            break;
+          case 5:
+            menu.toggle();
+            break;
+          default:
+            menu.setActiveItem(item);
         }
       }
       return;
