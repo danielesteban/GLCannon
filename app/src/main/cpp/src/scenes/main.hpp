@@ -5,6 +5,7 @@
 class MainScene : public Scene {
   public:
     void load(btDiscreteDynamicsWorld *world, Camera *camera, Model *groundModel, Model *skyboxModel, Model *cubeModel);
+    void unload();
     void simulate(const btScalar delta);
     void reset();
   private:

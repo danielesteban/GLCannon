@@ -31,6 +31,12 @@ void MainScene::load(btDiscreteDynamicsWorld *world, Camera *camera, Model *grou
   }
 }
 
+void MainScene::unload() {
+  Scene::unload();
+  cubes.clear();
+  resetting = false;
+}
+
 void MainScene::simulate(const btScalar delta) {
   if (isResetting()) {
     explosionTimer -= delta;
