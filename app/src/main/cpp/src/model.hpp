@@ -6,6 +6,7 @@
 #include <SDL_opengles2.h>
 #include <btBulletDynamicsCommon.h>
 #include "shader.hpp"
+#include "texture.hpp"
 
 class Model {
   public:
@@ -21,7 +22,7 @@ class Model {
       const GLint TEXTUREWRAP = GL_REPEAT
     );
     virtual void init(Shader *shader);
-    void initTexture();
+    void updateTexture(const char *filename);
     void render(const GLfloat *view, const GLfloat *normalView);
     btCollisionShape *collision;
     Shader *shader;

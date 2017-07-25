@@ -14,6 +14,8 @@ class Camera {
     void resize(int w, int h);
     void updateVectors();
     void updateView();
+    float tilt;
+    float pitch;
     glm::vec3 position;
     glm::mat4 projection;
     glm::mat4 projection2D;
@@ -23,8 +25,6 @@ class Camera {
     glm::vec3 right;
     glm::vec3 up;
   private:
-    float tilt;
-    float pitch;
     static const float fov;
     static const float maxTilt;
     static const float maxPitch;

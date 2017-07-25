@@ -3,7 +3,6 @@
 const GLfloat MenuModel::itemSize = 100.0f;
 
 void MenuModel::init(Shader *shader, const char *texture, const int numItems) {
-  textureFilename = texture;
   this->numItems = numItems;
   activeUniform = glGetUniformLocation(shader->program, "active");
   const GLushort planeIndices[] = {
@@ -44,6 +43,7 @@ void MenuModel::init(Shader *shader, const char *texture, const int numItems) {
   vboData = NULL;
   delete [] EBO;
   eboData = NULL;
+  updateTexture(texture);
   glUseProgram(shader->program);
   glEnableVertexAttribArray(shader->position);
   glVertexAttribPointer(shader->position, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0);

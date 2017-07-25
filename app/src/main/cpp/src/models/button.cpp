@@ -18,8 +18,8 @@ const GLsizei ButtonModel::EBOSIZE = sizeof(ButtonModel::EBO);
 const GLsizei ButtonModel::EBOCOUNT = sizeof(ButtonModel::EBO) / sizeof(GLushort);
 
 void ButtonModel::init(Shader *shader, const char *texture) {
-  textureFilename = texture;
   Model::init(shader);
+  updateTexture(texture);
   glUseProgram(shader->program);
   glEnableVertexAttribArray(shader->position);
   glVertexAttribPointer(shader->position, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0);

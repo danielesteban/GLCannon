@@ -44,5 +44,6 @@ void Shader::init() {
   normalView = glGetUniformLocation(program, "normalView");
   texture = glGetUniformLocation(program, "texture");
   albedo = glGetUniformLocation(program, "albedo");
+  fogColor = glGetUniformLocation(program, "fogColor");
   sunPosition = glGetUniformLocation(program, "sunPosition");
 }

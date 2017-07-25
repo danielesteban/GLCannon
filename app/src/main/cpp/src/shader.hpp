@@ -17,6 +17,7 @@ class Shader {
     GLint normalView;
     GLint texture;
     GLint albedo;
+    GLint fogColor;
     GLint sunPosition;
   private:
     const char *vertex_src;

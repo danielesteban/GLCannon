@@ -31,6 +31,7 @@ class Mesh {
     void setPosition(const btVector3 position);
     void setRotation(const btQuaternion rotation);
     void applyImpulse(const btVector3 impulse);
+    const Model* getModel();
   protected:
     Model *model;
     btTransform transform;

@@ -53,8 +53,6 @@ const GLushort SkyboxModel::EBO[] = {
 const GLsizei SkyboxModel::EBOSIZE = sizeof(SkyboxModel::EBO);
 const GLsizei SkyboxModel::EBOCOUNT = sizeof(SkyboxModel::EBO) / sizeof(GLushort);
 
-const char SkyboxModel::TEXTURE[] = "skybox";
-
 void SkyboxModel::init(Shader *shader) {
   Model::init(shader);
   glUseProgram(shader->program);

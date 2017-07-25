@@ -7,9 +7,9 @@ const float Camera::sensitivity = 3.0f;
 const glm::vec3 Camera::worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
 Camera::Camera() {
-  position = glm::vec3(0.0f, 1.62f, 0.0f);
+  position = glm::vec3(0.0f, 0.0f, 0.0f);
   tilt = glm::radians(90.0f);
-  pitch = glm::radians(8.0f);
+  pitch = glm::radians(0.0f);
 }
 
 void Camera::processInput(float dx, float dy) {

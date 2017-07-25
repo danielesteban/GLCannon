@@ -4,7 +4,7 @@
 
 class GroundModel : public Model {
   public:
-    GroundModel() : Model(VBO, VBOSIZE, EBO, EBOSIZE, EBOCOUNT, TEXTURE) {}
+    GroundModel() : Model(VBO, VBOSIZE, EBO, EBOSIZE, EBOCOUNT) {}
     void init(Shader *shader);
   private:
     static const GLfloat VBO[];
@@ -12,5 +12,4 @@ class GroundModel : public Model {
     static const GLushort EBO[];
     static const GLsizei EBOSIZE;
     static const GLsizei EBOCOUNT;
-    static const char TEXTURE[];
 };

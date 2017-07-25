@@ -17,8 +17,6 @@ const GLushort GroundModel::EBO[] = {
 const GLsizei GroundModel::EBOSIZE = sizeof(GroundModel::EBO);
 const GLsizei GroundModel::EBOCOUNT = sizeof(GroundModel::EBO) / sizeof(GLushort);
 
-const char GroundModel::TEXTURE[] = "sand";
-
 void GroundModel::init(Shader *shader) {
   Model::init(shader);
   glUseProgram(shader->program);

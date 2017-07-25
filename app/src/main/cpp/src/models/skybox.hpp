@@ -4,7 +4,7 @@
 
 class SkyboxModel : public Model {
   public:
-    SkyboxModel() : Model(VBO, VBOSIZE, EBO, EBOSIZE, EBOCOUNT, TEXTURE, GL_TEXTURE_CUBE_MAP) {}
+    SkyboxModel() : Model(VBO, VBOSIZE, EBO, EBOSIZE, EBOCOUNT, NULL, GL_TEXTURE_CUBE_MAP) {}
     void init(Shader *shader);
   private:
     static const GLfloat VBO[];
@@ -12,5 +12,4 @@ class SkyboxModel : public Model {
     static const GLushort EBO[];
     static const GLsizei EBOSIZE;
     static const GLsizei EBOCOUNT;
-    static const char TEXTURE[];
 };

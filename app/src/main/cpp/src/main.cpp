@@ -11,6 +11,7 @@
 #include "mesh.hpp"
 #include "meshes/button.hpp"
 #include "meshes/menu.hpp"
+#include "meshes/skybox.hpp"
 #include "meshes/sphere.hpp"
 #include "models/button.hpp"
 #include "models/cube.hpp"
@@ -18,6 +19,10 @@
 #include "models/menu.hpp"
 #include "models/skybox.hpp"
 #include "models/sphere.hpp"
+#include "scene.hpp"
+#include "scenes/main.hpp"
+#include "scenes/test.hpp"
+#include "shader.hpp"
 #include "shaders/button.hpp"
 #include "shaders/menu.hpp"
 #include "shaders/skybox.hpp"
@@ -34,9 +39,6 @@ int width = 0;
 int height = 0;
 
 Camera camera;
-const glm::vec3 sunPosition = glm::vec3(
-  -0.1, 0.9, -1.0
-);
 
 ButtonShader buttonShader;
 MenuShader menuShader;
@@ -59,12 +61,24 @@ MenuModel menuModel;
 SkyboxModel skyboxModel;
 SphereModel sphereModel;
 
-std::vector<Mesh> cubes;
 Button fireButton;
-Mesh ground;
 Menu menu;
-Mesh skybox;
+Skybox skybox;
 std::vector<Sphere> spheres;
+
+Scene *scene = NULL;
+int sceneIndex = -1;
+enum {
+  SCENE_MAIN,
+  SCENE_TEST,
+  NUM_SCENES,
+};
+MainScene mainScene;
+TestScene testScene;
+Scene *scenes[] = {
+  &mainScene,
+  &testScene,
+};
 
 btDefaultCollisionConfiguration *collisionConfiguration;
 btCollisionDispatcher *dispatcher;
@@ -73,8 +87,6 @@ btSequentialImpulseConstraintSolver *solver;
 btDiscreteDynamicsWorld *world;
 
 Mix_Chunk *cannonSound = NULL;
-float explodingSceneTimer;
-bool explodingScene = false;
 
 void resize();
 void init() {
@@ -96,14 +108,10 @@ void init() {
   SDL_GL_SetSwapInterval(1);
   for (int i = 0; i < sizeof(shaders) / sizeof(Shader*); i += 1) {
     shaders[i]->init();
-    if (shaders[i]->sunPosition != -1) {
-      glUseProgram(shaders[i]->program);
-      glUniform3fv(shaders[i]->sunPosition, 1, glm::value_ptr(sunPosition));
-    }
   }
   resize();
 
-  cannonSound = Mix_LoadWAV("cannon.ogg");
+  srand(time(NULL));
 
   collisionConfiguration = new btDefaultCollisionConfiguration();
   dispatcher = new btCollisionDispatcher(collisionConfiguration);
@@ -120,6 +128,19 @@ void init() {
   SDL_RWread(file, roboto, size, 1);
   SDL_RWclose(file);
   io.Fonts->AddFontFromMemoryTTF(roboto, size, 32.0f);
+
+  cannonSound = Mix_LoadWAV("cannon.ogg");
+
+  fireButtonModel.init(&buttonShader, "fire");
+  fireButton.init(&fireButtonModel, btVector3(camera.canvas2D[0] - 96.0f, 96.0f, 0.0f));
+  menuModel.init(&menuShader, "menu", 6);
+  menu.init(&menuModel, camera.canvas2D[1] - MenuModel::itemSize);
+
+  cubeModel.init(&standardShader);
+  groundModel.init(&standardShader);
+  skyboxModel.init(&skyboxShader);
+  sphereModel.init(&sphereShader);
+  skybox.init(&skyboxModel);
 }
 
 void resize() {
@@ -138,39 +159,6 @@ void resize() {
   }
 }
 
-void playSound(Mix_Chunk *sound, const float volume) {
-  int channel = Mix_PlayChannel(-1, sound, 0);
-  if (channel != -1) Mix_Volume(channel, (int) ((float) MIX_MAX_VOLUME * volume));
-}
-
-void explodeScene() {
-  explodingScene = true;
-  explodingSceneTimer = 3.5f;
-  for (std::vector<Mesh>::iterator cube = cubes.begin(); cube != cubes.end(); ++cube) {
-    const btVector3 position = (*cube).getPosition();
-    const float force = 80.0f + (float) ((rand() % 101) - 50);
-    (*cube).applyImpulse(btVector3(position.x() * 6.0f, std::max(std::abs(position.x()), std::abs(position.z())) * 2.0f, position.z() * 2.0f).normalize() * force);
-  }
-  for (std::vector<Sphere>::iterator sphere = spheres.begin(); sphere != spheres.end(); ++sphere) {
-    (*sphere).destroy();
-  }
-  spheres.clear();
-  playSound(cannonSound, 1.0f);
-}
-
-void spawnSphere(btScalar force) {
-  if (spheres.size() >= MAX_SPHERES) {
-    spheres.front().destroy();
-    spheres.erase(spheres.begin());
-  }
-  const btScalar power = btScalar(menu.getActiveItem() + 1);
-  Sphere sphere;
-  sphere.init(world, &sphereModel, btVector3(camera.position[0], camera.position[1], camera.position[2]));
-  sphere.applyImpulse(btVector3(camera.front[0], camera.front[1], camera.front[2]) * 50.0f * power * force);
-  spheres.push_back(sphere);
-  playSound(cannonSound, 0.2f * power * force);
-}
-
 void openGitHub() {
   JNIEnv *env = (JNIEnv *)SDL_AndroidGetJNIEnv();
   jobject activity = (jobject)SDL_AndroidGetActivity();
@@ -179,6 +167,52 @@ void openGitHub() {
   env->CallVoidMethod(activity, method_id);
   env->DeleteLocalRef(activity);
   env->DeleteLocalRef(clazz);
+}
+
+void playSound(Mix_Chunk *sound, const float volume) {
+  int channel = Mix_PlayChannel(-1, sound, 0);
+  if (channel != -1) Mix_Volume(channel, (int) ((float) MIX_MAX_VOLUME * volume));
+}
+
+void spawnSphere(btScalar force) {
+  if (spheres.size() >= MAX_SPHERES) {
+    spheres.front().destroy();
+    spheres.erase(spheres.begin());
+  }
+  const btScalar power = btScalar(menu.getActiveItem() + 2);
+  Sphere sphere;
+  sphere.init(world, &sphereModel, btVector3(camera.position[0], camera.position[1], camera.position[2]));
+  sphere.applyImpulse(btVector3(camera.front[0], camera.front[1], camera.front[2]) * 50.0f * power * force);
+  spheres.push_back(sphere);
+  playSound(cannonSound, 0.2f * power * force);
+}
+
+void clearSpheres() {
+  if (!spheres.empty()) {
+    for (std::vector<Sphere>::iterator sphere = spheres.begin(); sphere != spheres.end(); ++sphere) {
+      (*sphere).destroy();
+    }
+    spheres.clear();
+  }
+}
+
+void loadScene(const int index) {
+  if (scene != NULL) {
+    scene->unload();
+    clearSpheres();
+  }
+  scene = scenes[index];
+  sceneIndex = index;
+  scene->load(world, &camera, &groundModel, &skyboxModel, &cubeModel);
+  for (int i = 0; i < sizeof(shaders) / sizeof(Shader*); i += 1) {
+    glUseProgram(shaders[i]->program);
+    if(shaders[i]->fogColor != -1) {
+      glUniform4fv(shaders[i]->fogColor, 1, scene->getFogColor());
+    }
+    if(shaders[i]->sunPosition != -1) {
+      glUniform3fv(shaders[i]->sunPosition, 1, scene->getSunPosition());
+    }
+  }
 }
 
 int firingFinger = -1;
@@ -199,7 +233,7 @@ void processTouch(const Uint32 event, const int finger, const float x, const flo
     fireButton.setFiring(false);
     firingFinger = -1;
   }
-  if (!explodingScene && !fireButton.isFiring() && hoverFire && event == SDL_FINGERDOWN) {
+  if (!scene->isResetting() && !fireButton.isFiring() && hoverFire && event == SDL_FINGERDOWN) {
     fireButton.setFiring(true);
     firingFinger = finger;
   }
@@ -214,8 +248,15 @@ void processTouch(const Uint32 event, const int finger, const float x, const flo
       if (event == SDL_FINGERUP) {
         const int item = menu.click(UIx);
         switch (item) {
+          case 0:
+            loadScene((sceneIndex + 1) % NUM_SCENES);
+          break;
           case 3:
-            if (!explodingScene) explodeScene();
+            if (!scene->isResetting()) {
+              clearSpheres();
+              scene->reset();
+              playSound(cannonSound, 1.0f);
+            }
             break;
           case 4:
             openGitHub();
@@ -243,71 +284,19 @@ void processTouch(const Uint32 event, const int finger, const float x, const flo
   }
 }
 
-void resetScene() {
-  explodingScene = false;
-  for (std::vector<Mesh>::iterator cube = cubes.begin(); cube != cubes.end(); ++cube) {
-    (*cube).reset();
-  }
-  if (!spheres.empty()) {
-    for (std::vector<Sphere>::iterator sphere = spheres.begin(); sphere != spheres.end(); ++sphere) {
-      (*sphere).destroy();
-    }
-    spheres.clear();
-  }
-}
-
-void setupScene() {
-  srand(time(NULL));
-  cubeModel.init(&standardShader);
-  fireButtonModel.init(&buttonShader, "fire");
-  groundModel.init(&standardShader);
-  menuModel.init(&menuShader, "menu", 6);
-  skyboxModel.init(&skyboxShader);
-  sphereModel.init(&sphereShader);
-
-  fireButton.init(&fireButtonModel, btVector3(camera.canvas2D[0] - 96.0f, 96.0f, 0.0f));
-  ground.init(world, &groundModel, btVector3(0.0f, -1.0f, 0.0f));
-  menu.init(&menuModel, camera.canvas2D[1] - MenuModel::itemSize);
-  skybox.init(NULL, &skyboxModel, btVector3(camera.position[0], camera.position[1], camera.position[2]));
-
-  for (int x = -3; x < 4; x += 1)
-  for (int y = 0; y < 5; y += 1) {
-    Mesh cube;
-    const float offset = (float) x * 1.12f;
-    const btVector3 position = btVector3(offset, (float) y + 0.5f, 8.0f - std::exp(std::abs((float) x)) * 0.18f);
-    const btQuaternion rotation = btQuaternion(
-      btVector3(0.0f, 1.0f, 0.0f),
-      glm::radians(offset * 14.0f)
-    );
-    cube.init(world, &cubeModel, position, rotation, btScalar(5.0f));
-    cubes.push_back(cube);
-  }
-}
-
-void simulateScene(const btScalar delta) {
+void simulate(const btScalar delta) {
   world->stepSimulation(delta, 4);
-  if (explodingScene) {
-    explodingSceneTimer -= delta;
-    if (explodingSceneTimer <= 0.0f) {
-      resetScene();
-    }
-  }
   fireButton.simulate(delta);
   menu.simulate(delta);
-  for (std::vector<Mesh>::iterator cube = cubes.begin(); cube != cubes.end(); ++cube) {
-    (*cube).simulate(delta);
-  }
+  scene->simulate(delta);
   for (std::vector<Sphere>::iterator sphere = spheres.begin(); sphere != spheres.end(); ++sphere) {
     (*sphere).simulate(delta);
   }
 }
 
-void renderScene() {
-  glUseProgram(standardShader.program);
-  ground.render(&camera);
-  for (std::vector<Mesh>::iterator cube = cubes.begin(); cube != cubes.end(); ++cube) {
-    (*cube).render(&camera);
-  }
+void render() {
+  /* Scene */
+  scene->render(&camera);
   glUseProgram(sphereShader.program);
   for (std::vector<Sphere>::iterator sphere = spheres.begin(); sphere != spheres.end(); ++sphere) {
     (*sphere).render(&camera);
@@ -316,9 +305,8 @@ void renderScene() {
   glDepthFunc(GL_LEQUAL);
   skybox.render(&camera);
   glDepthFunc(GL_LESS);
-}
 
-void renderUI() {
+  /* UI */
   glUseProgram(buttonShader.program);
   glEnable(GL_BLEND);
   fireButton.render();
@@ -360,17 +348,16 @@ void loop() {
     unsigned int currentTicks = SDL_GetTicks();
     const btScalar delta = btScalar(currentTicks - lastTicks) / btScalar(1000.0f);
     lastTicks = currentTicks;
-    simulateScene(delta);
+    simulate(delta);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    renderScene();
-    renderUI();
+    render();
     SDL_GL_SwapWindow(gWindow);
   }
 }
 
 int main(int argc, char *args[]) {
   init();
-  setupScene();
+  loadScene(SCENE_MAIN);
   loop();
   return 0;
 }
