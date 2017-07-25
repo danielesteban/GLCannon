@@ -1,10 +1,10 @@
 #include "ground.hpp"
 
 const GLfloat GroundModel::VBO[] = {
-  -128.0000f,  1.000000f, -128.0000f,     0.000000f,  1.000000f,  0.000000f,     0.000000f,  256.0000f,
-  -128.0000f,  1.000000f,  128.0000f,     0.000000f,  1.000000f,  0.000000f,     256.0000f,  256.0000f,
-   128.0000f,  1.000000f,  128.0000f,     0.000000f,  1.000000f,  0.000000f,     256.0000f,  0.000000f,
-   128.0000f,  1.000000f, -128.0000f,     0.000000f,  1.000000f,  0.000000f,     0.000000f,  0.000000f,
+  -512.0000f,  1.000000f, -512.0000f,     0.000000f,  1.000000f,  0.000000f,     0.000000f,  1024.0000f,
+  -512.0000f,  1.000000f,  512.0000f,     0.000000f,  1.000000f,  0.000000f,     1024.0000f, 1024.0000f,
+   512.0000f,  1.000000f,  512.0000f,     0.000000f,  1.000000f,  0.000000f,     1024.0000f, 0.000000f,
+   512.0000f,  1.000000f, -512.0000f,     0.000000f,  1.000000f,  0.000000f,     0.000000f,  0.000000f,
 };
 
 const GLsizei GroundModel::VBOSIZE = sizeof(GroundModel::VBO);
@@ -27,5 +27,5 @@ void GroundModel::init(Shader *shader) {
   glEnableVertexAttribArray(shader->uv);
   glVertexAttribPointer(shader->uv, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*) (6 * sizeof(GLfloat)));
   glBindVertexArrayOES(0);
-  collision = new btBoxShape(btVector3(128.0000f, 1.000000f, 128.0000f));
+  collision = new btBoxShape(btVector3(512.0000f, 1.000000f, 512.0000f));
 }
