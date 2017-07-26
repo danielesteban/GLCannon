@@ -180,9 +180,10 @@ void spawnSphere(btScalar force) {
     spheres.erase(spheres.begin());
   }
   const btScalar power = btScalar(menu.getActiveItem() + 2);
+  const btVector3 direction = btVector3(camera.front[0], camera.front[1], camera.front[2]);
   Sphere sphere;
-  sphere.init(world, &sphereModel, btVector3(camera.position[0], camera.position[1], camera.position[2]));
-  sphere.applyImpulse(btVector3(camera.front[0], camera.front[1], camera.front[2]) * 50.0f * power * force);
+  sphere.init(world, &sphereModel, btVector3(camera.position[0], camera.position[1], camera.position[2]) + direction * 0.1f);
+  sphere.applyImpulse(direction * 50.0f * power * force);
   spheres.push_back(sphere);
   playSound(cannonSound, 0.2f * power * force);
 }

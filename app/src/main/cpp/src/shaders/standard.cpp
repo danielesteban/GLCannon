@@ -27,7 +27,7 @@ const char *StandardShader::FRAGMENT =
 " uniform vec3 sunPosition; "
 " const float LOG2 = 1.442695; "
 " const float density = 0.03; "
-" const float ambientFactor = 0.15; "
+" const float ambientFactor = 0.2; "
 " void main() { "
 "   float distance = length(fragmentPosition); "
 "   float fogFactor = clamp(exp2(-density * density * distance * distance * LOG2), 0.0, 1.0); "
